@@ -1,7 +1,7 @@
 SonarCloud Issue Summary
 ========================
 
-Quality Gate : NONE
+Quality Gate : ERROR
 Bugs         : N/A
 Vulnerabilities: N/A
 Security Hotspots: N/A

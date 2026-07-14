@@ -1,0 +1,23 @@
+{
+  "status": "OK",
+  "fixes": [
+    {
+      "rule": "outdated-base-image",
+      "category": "vulnerability",
+      "file": "Dockerfile",
+      "description": "Added `apt-get upgrade -y` to runtime stage to remediate image-level OS-package CVEs (30 findings, e.g. bsdutils, gzip, libblkid1, libc-bin, libc6)",
+      "safe": true,
+      "fixes_count": 30
+    }
+  ],
+  "files_changed": [
+    "Dockerfile"
+  ],
+  "diff_stat": " Dockerfile | 1 +\n 1 file changed, 1 insertion(+)\n",
+  "committed_locally": true,
+  "pushed": false,
+  "pr_url": null,
+  "branch": "ai-remediation/local",
+  "target": "main",
+  "skipped_findings": []
+}

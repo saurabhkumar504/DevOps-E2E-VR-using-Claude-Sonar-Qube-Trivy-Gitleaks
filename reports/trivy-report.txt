@@ -1,0 +1,53 @@
+Trivy Scan Summary (filesystem + image)
+========================================
+
+Total findings: 54
+
+By severity:
+  CRITICAL  0
+  HIGH      2
+  MEDIUM    32
+  LOW       20
+  UNKNOWN   0
+
+By scanner:
+  fs        0
+  image     54
+
+By category:
+  vulnerability   54
+
+Top 30 findings (sorted by severity, then by file):
+-------------------------------------------------
+[HIGH    ] image vulnerability CVE-2026-54512     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.18.8, 3.1.4, 2.21.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[HIGH    ] image vulnerability CVE-2026-54513     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.18.8, 2.21.4, 3.1.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-54514     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.18.8, 2.21.4, 3.1.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-54515     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 3.1.4, 2.18.9, 2.21.5, 2.22.1  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-54516     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.21.4, 3.1.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-54517     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.21.4, 3.1.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-54518     com.fasterxml.jackson.core:jackson-databind@2.21.2 -> 2.21.4  -- app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-47838     org.springframework.security:spring-security-web@6.5.10 -> 6.5.11  -- app/app.jar/BOOT-INF/lib/spring-security-web-6.5.10.jar:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     bsdutils@1:2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     libblkid1@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-4046      libc-bin@2.35-0ubuntu3.13 -> Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-5435      libc-bin@2.35-0ubuntu3.13 -> Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-6238      libc-bin@2.35-0ubuntu3.13 -> Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-4046      libc6@2.35-0ubuntu3.13 -> Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-5435      libc6@2.35-0ubuntu3.13 -> Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-6238      libc6@2.35-0ubuntu3.13 -> Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2025-66382     libexpat1@2.4.7-1ubuntu0.7 -> Link: [CVE-2025-66382](https://avd.aquasec.com/nvd/cve-2025-66382)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     libmount1@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-13757     libp11-kit0@0.24.0-6build1 -> Link: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-40930     libpng16-16@1.6.37-3ubuntu0.5 -> Link: [CVE-2026-40930](https://avd.aquasec.com/nvd/cve-2026-40930)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     libsmartcols1@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     libuuid1@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-4046      locales@2.35-0ubuntu3.13 -> Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-5435      locales@2.35-0ubuntu3.13 -> Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-6238      locales@2.35-0ubuntu3.13 -> Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     mount@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-13757     p11-kit@0.24.0-6build1 -> Link: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-13757     p11-kit-modules@0.24.0-6build1 -> Link: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2026-27456     util-linux@2.37.2-4ubuntu3.5 -> Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)  -- library/vulnerable-spring-app:1
+[MEDIUM  ] image vulnerability CVE-2021-31879     wget@1.21.2-2ubuntu1.1 -> Link: [CVE-2021-31879](https://avd.aquasec.com/nvd/cve-2021-31879)  -- library/vulnerable-spring-app:1
+
+... and 24 more (see trivy-report.json)

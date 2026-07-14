@@ -1,0 +1,18 @@
+[
+  {
+    "tool": "trivy",
+    "ruleId": "CVE-2026-99999",
+    "level": "ERROR",
+    "severity": "HIGH",
+    "cve": "CVE-2026-99999",
+    "pkgName": "commons-io:commons-io",
+    "installedVersion": "2.13.0",
+    "fixedVersion": "2.14.0",
+    "description": "commons-io path traversal",
+    "file": "pom.xml",
+    "line": 78,
+    "recommendation": "Upgrade commons-io:commons-io to 2.14.0",
+    "category": "vulnerability",
+    "scanner": "fs"
+  }
+]

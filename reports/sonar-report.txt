@@ -1,0 +1,17 @@
+SonarCloud Issue Summary
+========================
+
+Quality Gate : ERROR
+Bugs         : N/A
+Vulnerabilities: N/A
+Security Hotspots: N/A
+Code Smells  : N/A
+Coverage     : N/A%
+Duplication  : N/A%
+Tech Debt    : N/A
+
+Total issues exported: 0
+By severity:
+
+Top issues (sorted by severity, then by file):
+----------------------------------------------

@@ -1,0 +1,188 @@
+{
+  "status": "STUB",
+  "summary": "NVIDIA API unavailable \u2014 generated a deterministic fallback review from the scanner outputs.",
+  "risk_score": 550,
+  "overall_priority": "P1",
+  "findings": [
+    {
+      "id": "SR-001",
+      "title": "CVE-2026-54512",
+      "severity": "HIGH",
+      "priority": "P1",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "com.fasterxml.jackson.core:jackson-databind",
+      "line": 1,
+      "rule_id": "CVE-2026-54512",
+      "evidence": "",
+      "suggested_fix": "Upgrade com.fasterxml.jackson.core:jackson-databind to 2.18.8, 3.1.4, 2.21.4",
+      "risk_score": 75
+    },
+    {
+      "id": "SR-002",
+      "title": "CVE-2026-54513",
+      "severity": "HIGH",
+      "priority": "P1",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "com.fasterxml.jackson.core:jackson-databind",
+      "line": 1,
+      "rule_id": "CVE-2026-54513",
+      "evidence": "",
+      "suggested_fix": "Upgrade com.fasterxml.jackson.core:jackson-databind to 2.18.8, 2.21.4, 3.1.4",
+      "risk_score": 75
+    },
+    {
+      "id": "SR-003",
+      "title": "CVE-2026-27456",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "bsdutils",
+      "line": 1,
+      "rule_id": "CVE-2026-27456",
+      "evidence": "",
+      "suggested_fix": "Upgrade bsdutils to Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-004",
+      "title": "CVE-2026-27456",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libblkid1",
+      "line": 1,
+      "rule_id": "CVE-2026-27456",
+      "evidence": "",
+      "suggested_fix": "Upgrade libblkid1 to Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-005",
+      "title": "CVE-2026-4046",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc-bin",
+      "line": 1,
+      "rule_id": "CVE-2026-4046",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc-bin to Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-006",
+      "title": "CVE-2026-5435",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc-bin",
+      "line": 1,
+      "rule_id": "CVE-2026-5435",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc-bin to Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-007",
+      "title": "CVE-2026-6238",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc-bin",
+      "line": 1,
+      "rule_id": "CVE-2026-6238",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc-bin to Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-008",
+      "title": "CVE-2026-4046",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc6",
+      "line": 1,
+      "rule_id": "CVE-2026-4046",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc6 to Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-009",
+      "title": "CVE-2026-5435",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc6",
+      "line": 1,
+      "rule_id": "CVE-2026-5435",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc6 to Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)",
+      "risk_score": 50
+    },
+    {
+      "id": "SR-010",
+      "title": "CVE-2026-6238",
+      "severity": "MEDIUM",
+      "priority": "P2",
+      "category": "vulnerability",
+      "cwe": [],
+      "owasp": [
+        "A06:2021-Vulnerable and Outdated Components"
+      ],
+      "root_cause": "Outdated / vulnerable dependency.",
+      "file": "libc6",
+      "line": 1,
+      "rule_id": "CVE-2026-6238",
+      "evidence": "",
+      "suggested_fix": "Upgrade libc6 to Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)",
+      "risk_score": 50
+    }
+  ]
+}

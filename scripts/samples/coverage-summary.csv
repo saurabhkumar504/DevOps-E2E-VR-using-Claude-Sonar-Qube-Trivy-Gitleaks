@@ -1,0 +1,5 @@
+package,line_missed,line_covered,line_total,line_pct,branch_missed,branch_covered,branch_total,branch_pct
+com.owasp.lab.controller,40,120,160,75.0,10,30,40,75.0
+com.owasp.lab.service,20,180,200,90.0,5,15,20,75.0
+com.owasp.lab.repository,30,90,120,75.0,8,24,32,75.0
+com.owasp.lab.util,15,35,50,70.0,4,8,12,66.67

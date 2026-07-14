@@ -1,0 +1,15 @@
+status=STUB
+risk_score=550
+priority=P1
+finding_count=10
+
+[HIGH    ] SR-001 CVE-2026-54512  -- com.fasterxml.jackson.core:jackson-databind:1
+[HIGH    ] SR-002 CVE-2026-54513  -- com.fasterxml.jackson.core:jackson-databind:1
+[MEDIUM  ] SR-003 CVE-2026-27456  -- bsdutils:1
+[MEDIUM  ] SR-004 CVE-2026-27456  -- libblkid1:1
+[MEDIUM  ] SR-005 CVE-2026-4046  -- libc-bin:1
+[MEDIUM  ] SR-006 CVE-2026-5435  -- libc-bin:1
+[MEDIUM  ] SR-007 CVE-2026-6238  -- libc-bin:1
+[MEDIUM  ] SR-008 CVE-2026-4046  -- libc6:1
+[MEDIUM  ] SR-009 CVE-2026-5435  -- libc6:1
+[MEDIUM  ] SR-010 CVE-2026-6238  -- libc6:1

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "status": "OK",
+  "project": "vulnerable-spring-app",
+  "projectKey": "vulnerable-spring-app",
+  "host": "https://sonarcloud.io",
+  "branch": "main",
+  "commit": "abc123def456",
+  "analysisDate": "2026-07-13T08:25:00Z",
+  "qualityGate": "OK",
+  "bugs": 2,
+  "vulnerabilities": 0,
+  "codeSmells": 21,
+  "securityHotspots": 1,
+  "coverage": 78.0,
+  "duplicatedLines": 6.0,
+  "technicalDebt": "55",
+  "reliabilityRating": "1",
+  "securityRating": "1",
+  "maintainabilityRating": "2",
+  "newIssues": {
+    "bugs": 0,
+    "vulnerabilities": 0,
+    "codeSmells": 1,
+    "securityHotspots": 0
+  },
+  "overallIssueCounts": {
+    "total": 24,
+    "blocker": 0,
+    "critical": 0,
+    "major": 4,
+    "minor": 19,
+    "info": 1
+  }
+}

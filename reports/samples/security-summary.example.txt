@@ -1,0 +1,11 @@
+status=OK
+risk_score=86
+priority=P0
+finding_count=6
+
+[CRITICAL ] SR-001 User input concatenated into a native SQL query (SQL injection)  -- src/main/java/com/owasp/lab/service/UserService.java:39
+[CRITICAL ] SR-002 Hardcoded JWT signing key  -- src/main/resources/application.properties:27
+[HIGH    ] SR-003 Plaintext password comparison  -- src/main/java/com/owasp/lab/service/UserService.java:60
+[HIGH    ] SR-004 Reflected XSS in /api/comment/greet  -- src/main/java/com/owasp/lab/controller/CommentController.java:27
+[HIGH    ] SR-005 Unsafe Java native deserialisation  -- src/main/java/com/owasp/lab/controller/InsecureDeserializationController.java:24
+[MEDIUM  ] SR-006 CSRF protection disabled globally  -- src/main/java/com/owasp/lab/config/SecurityConfig.java:18

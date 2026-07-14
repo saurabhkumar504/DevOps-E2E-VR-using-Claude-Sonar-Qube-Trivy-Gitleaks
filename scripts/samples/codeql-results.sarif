@@ -1,0 +1,51 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CodeQL",
+          "rules": [
+            {
+              "id": "java/sql-injection",
+              "properties": { "security-severity": "9.1" }
+            },
+            {
+              "id": "java/path-injection",
+              "properties": { "security-severity": "7.5" }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "java/sql-injection",
+          "level": "error",
+          "message": { "text": "Query built by concatenation of a user-controlled value" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/main/java/com/owasp/lab/service/UserService.java" },
+                "region": { "startLine": 78 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "java/path-injection",
+          "level": "warning",
+          "message": { "text": "Tainted path used in file operation" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/main/java/com/owasp/lab/controller/FileController.java" },
+                "region": { "startLine": 33 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

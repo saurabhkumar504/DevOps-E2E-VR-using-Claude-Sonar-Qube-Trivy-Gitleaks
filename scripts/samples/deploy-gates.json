@@ -1,0 +1,16 @@
+{
+  "all_passed": false,
+  "deploy_recommended": false,
+  "gates": [
+    {"name": "build_succeeded",            "expected": true,                            "actual": true,   "passed": true},
+    {"name": "coverage_threshold",         "expected": ">= 80%",                       "actual": 78.0,   "passed": false},
+    {"name": "sonar_quality_gate",         "expected": "OK",                            "actual": "OK",   "passed": true},
+    {"name": "no_remaining_vulnerabilities","expected": 0,                              "actual": 0,      "passed": true},
+    {"name": "no_critical_trivy",          "expected": "0 (allow_critical=false)",      "actual": 0,      "passed": true},
+    {"name": "no_high_trivy",              "expected": "0 (allow_high=false)",          "actual": 1,      "passed": false},
+    {"name": "no_critical_codeql",         "expected": "0 (allow_critical=false)",      "actual": 1,      "passed": false},
+    {"name": "no_high_codeql",             "expected": "0 (allow_high=false)",          "actual": 1,      "passed": false},
+    {"name": "ai_remediation_completed",   "expected": true,                            "actual": "OK",   "passed": true}
+  ],
+  "environment": "dev"
+}

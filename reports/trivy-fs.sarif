@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "trivy",
+          "version": "0.72.0",
+          "informationUri": "https://github.com/aquasecurity/trivy"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": false,
+          "properties": { "placeholder": "filesystem scan of ." }
+        }
+      ],
+      "results": []
+    }
+  ]
+}

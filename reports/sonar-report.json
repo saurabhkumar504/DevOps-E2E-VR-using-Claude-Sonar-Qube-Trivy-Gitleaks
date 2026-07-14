@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "status": "OK",
+  "project": "vulnerable-spring-app",
+  "projectKey": "nikita-jo_poc2",
+  "host": "https://sonarcloud.io",
+  "branch": "main",
+  "commit": "e4efea838ff01a63715e647737c2fa44ba5eb914",
+  "analysisDate": "2026-07-14T09:45:37+0000",
+  "qualityGate": "ERROR",
+  "bugs": 0,
+  "vulnerabilities": 0,
+  "codeSmells": 0,
+  "securityHotspots": 0,
+  "coverage": null,
+  "duplicatedLines": null,
+  "technicalDebt": null,
+  "reliabilityRating": null,
+  "securityRating": null,
+  "maintainabilityRating": null,
+  "newIssues": {
+    "bugs": 0,
+    "vulnerabilities": 0,
+    "codeSmells": 0,
+    "securityHotspots": 0
+  },
+  "overallIssueCounts": {
+    "total": 0,
+    "blocker": 0,
+    "critical": 0,
+    "major": 0,
+    "minor": 0,
+    "info": 0
+  },
+  "raw": {
+    "metrics": {},
+    "issues": []
+  },
+  "generatedAt": "2026-07-14T09:46:18Z"
+}

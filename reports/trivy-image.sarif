@@ -1,0 +1,2344 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "fullName": "Trivy Vulnerability Scanner",
+          "informationUri": "https://github.com/aquasecurity/trivy",
+          "name": "Trivy",
+          "rules": [
+            {
+              "id": "CVE-2026-27456",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "util-linux: TOCTOU in the mount program when setting up loop devices"
+              },
+              "fullDescription": {
+                "text": "util-linux is a random collection of Linux utilities. Prior to version 2.41.4, a TOCTOU (Time-of-Check-Time-of-Use) vulnerability has been identified in the SUID binary /usr/bin/mount from util-linux. The mount binary, when setting up loop devices, validates the source file path with user privileges via fork() + setuid() + realpath(), but subsequently re-canonicalizes and opens it with root privileges (euid=0) without verifying that the path has not been replaced between both operations. Neither O_NOFOLLOW, nor inode comparison, nor post-open fstat() are employed. This allows a local unprivileged user to replace the source file with a symlink pointing to any root-owned file or device during the race window, causing the SUID binary to open and mount it as root. Exploitation requires an /etc/fstab entry with user,loop options whose path points to a directory where the attacker has write permission, and that /usr/bin/mount has the SUID bit set (the default configuration on virtually all Linux distributions). The impact is unauthorized read access to root-protected files and block devices, including backup images, disk volumes, and any file containing a valid filesystem. This issue has been patched in version 2.41.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-27456",
+              "help": {
+                "text": "Vulnerability CVE-2026-27456\nSeverity: MEDIUM\nPackage: util-linux\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)\nutil-linux is a random collection of Linux utilities. Prior to version 2.41.4, a TOCTOU (Time-of-Check-Time-of-Use) vulnerability has been identified in the SUID binary /usr/bin/mount from util-linux. The mount binary, when setting up loop devices, validates the source file path with user privileges via fork() + setuid() + realpath(), but subsequently re-canonicalizes and opens it with root privileges (euid=0) without verifying that the path has not been replaced between both operations. Neither O_NOFOLLOW, nor inode comparison, nor post-open fstat() are employed. This allows a local unprivileged user to replace the source file with a symlink pointing to any root-owned file or device during the race window, causing the SUID binary to open and mount it as root. Exploitation requires an /etc/fstab entry with user,loop options whose path points to a directory where the attacker has write permission, and that /usr/bin/mount has the SUID bit set (the default configuration on virtually all Linux distributions). The impact is unauthorized read access to root-protected files and block devices, including backup images, disk volumes, and any file containing a valid filesystem. This issue has been patched in version 2.41.4.",
+                "markdown": "**Vulnerability CVE-2026-27456**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|util-linux||[CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)|\n\nutil-linux is a random collection of Linux utilities. Prior to version 2.41.4, a TOCTOU (Time-of-Check-Time-of-Use) vulnerability has been identified in the SUID binary /usr/bin/mount from util-linux. The mount binary, when setting up loop devices, validates the source file path with user privileges via fork() + setuid() + realpath(), but subsequently re-canonicalizes and opens it with root privileges (euid=0) without verifying that the path has not been replaced between both operations. Neither O_NOFOLLOW, nor inode comparison, nor post-open fstat() are employed. This allows a local unprivileged user to replace the source file with a symlink pointing to any root-owned file or device during the race window, causing the SUID binary to open and mount it as root. Exploitation requires an /etc/fstab entry with user,loop options whose path points to a directory where the attacker has write permission, and that /usr/bin/mount has the SUID bit set (the default configuration on virtually all Linux distributions). The impact is unauthorized read access to root-protected files and block devices, including backup images, disk volumes, and any file containing a valid filesystem. This issue has been patched in version 2.41.4."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2022-27943",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "binutils: libiberty/rust-demangle.c in GNU GCC 11.2 allows stack exhaustion in demangle_const"
+              },
+              "fullDescription": {
+                "text": "libiberty/rust-demangle.c in GNU GCC 11.2 allows stack consumption in demangle_const, as demonstrated by nm-new."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2022-27943",
+              "help": {
+                "text": "Vulnerability CVE-2022-27943\nSeverity: LOW\nPackage: libstdc++6\nFixed Version: \nLink: [CVE-2022-27943](https://avd.aquasec.com/nvd/cve-2022-27943)\nlibiberty/rust-demangle.c in GNU GCC 11.2 allows stack consumption in demangle_const, as demonstrated by nm-new.",
+                "markdown": "**Vulnerability CVE-2022-27943**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libstdc++6||[CVE-2022-27943](https://avd.aquasec.com/nvd/cve-2022-27943)|\n\nlibiberty/rust-demangle.c in GNU GCC 11.2 allows stack consumption in demangle_const, as demonstrated by nm-new."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-4046",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "glibc: glibc: Denial of Service via iconv() function with specific character sets"
+              },
+              "fullDescription": {
+                "text": "The iconv() function in the GNU C Library versions 2.43 and earlier may crash due to an assertion failure when converting inputs from the IBM1390 or IBM1399 character sets, which may be used to remotely crash an application.\n\n\n\nThis vulnerability can be trivially mitigated by removing the IBM1390 and IBM1399 character sets from systems that do not need them."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-4046",
+              "help": {
+                "text": "Vulnerability CVE-2026-4046\nSeverity: MEDIUM\nPackage: locales\nFixed Version: \nLink: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)\nThe iconv() function in the GNU C Library versions 2.43 and earlier may crash due to an assertion failure when converting inputs from the IBM1390 or IBM1399 character sets, which may be used to remotely crash an application.\n\n\n\nThis vulnerability can be trivially mitigated by removing the IBM1390 and IBM1399 character sets from systems that do not need them.",
+                "markdown": "**Vulnerability CVE-2026-4046**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|locales||[CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)|\n\nThe iconv() function in the GNU C Library versions 2.43 and earlier may crash due to an assertion failure when converting inputs from the IBM1390 or IBM1399 character sets, which may be used to remotely crash an application.\n\n\n\nThis vulnerability can be trivially mitigated by removing the IBM1390 and IBM1399 character sets from systems that do not need them."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-5435",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "glibc: glibc: Out-of-bounds write via TSIG record processing"
+              },
+              "fullDescription": {
+                "text": "The deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.2 and newer fail to enforce the caller-supplied buffer length, and can result in an out-of-bounds write when printing TSIG records."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-5435",
+              "help": {
+                "text": "Vulnerability CVE-2026-5435\nSeverity: MEDIUM\nPackage: locales\nFixed Version: \nLink: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)\nThe deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.2 and newer fail to enforce the caller-supplied buffer length, and can result in an out-of-bounds write when printing TSIG records.",
+                "markdown": "**Vulnerability CVE-2026-5435**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|locales||[CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)|\n\nThe deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.2 and newer fail to enforce the caller-supplied buffer length, and can result in an out-of-bounds write when printing TSIG records."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-6238",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "glibc: glibc: Application crash or uninitialized memory read via crafted DNS response"
+              },
+              "fullDescription": {
+                "text": "The deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.0.1 to version 2.43 fail to validate the RDATA content against the RDATA length in a DNS response when processing A6, CERT, LOC, TKEY or TSIG records, which may allow an attacker to craft a DNS response, causing a target application to crash or read uninitialized memory.\n\nThese functions are for application debugging only and hence not in the path of code executed by the DNS resolver.  Further, they have been deprecated since version 2.34 and should not be used by any new applications.  Applications should consider porting away from these interfaces since they may be removed in future versions."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-6238",
+              "help": {
+                "text": "Vulnerability CVE-2026-6238\nSeverity: MEDIUM\nPackage: locales\nFixed Version: \nLink: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)\nThe deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.0.1 to version 2.43 fail to validate the RDATA content against the RDATA length in a DNS response when processing A6, CERT, LOC, TKEY or TSIG records, which may allow an attacker to craft a DNS response, causing a target application to crash or read uninitialized memory.\n\nThese functions are for application debugging only and hence not in the path of code executed by the DNS resolver.  Further, they have been deprecated since version 2.34 and should not be used by any new applications.  Applications should consider porting away from these interfaces since they may be removed in future versions.",
+                "markdown": "**Vulnerability CVE-2026-6238**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|locales||[CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)|\n\nThe deprecated functions ns_printrrf, ns_printrr and fp_nquery in the GNU C Library version 2.0.1 to version 2.43 fail to validate the RDATA content against the RDATA length in a DNS response when processing A6, CERT, LOC, TKEY or TSIG records, which may allow an attacker to craft a DNS response, causing a target application to crash or read uninitialized memory.\n\nThese functions are for application debugging only and hence not in the path of code executed by the DNS resolver.  Further, they have been deprecated since version 2.34 and should not be used by any new applications.  Applications should consider porting away from these interfaces since they may be removed in future versions."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2025-66382",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "libexpat: libexpat: Denial of service via crafted file processing"
+              },
+              "fullDescription": {
+                "text": "In libexpat through 2.7.3, a crafted file with an approximate size of 2 MiB can lead to dozens of seconds of processing time."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2025-66382",
+              "help": {
+                "text": "Vulnerability CVE-2025-66382\nSeverity: MEDIUM\nPackage: libexpat1\nFixed Version: \nLink: [CVE-2025-66382](https://avd.aquasec.com/nvd/cve-2025-66382)\nIn libexpat through 2.7.3, a crafted file with an approximate size of 2 MiB can lead to dozens of seconds of processing time.",
+                "markdown": "**Vulnerability CVE-2025-66382**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|libexpat1||[CVE-2025-66382](https://avd.aquasec.com/nvd/cve-2025-66382)|\n\nIn libexpat through 2.7.3, a crafted file with an approximate size of 2 MiB can lead to dozens of seconds of processing time."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2024-2236",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "libgcrypt: vulnerable to Marvin Attack"
+              },
+              "fullDescription": {
+                "text": "A timing-based side-channel flaw was found in libgcrypt's RSA implementation. This issue may allow a remote attacker to initiate a Bleichenbacher-style attack, which can lead to the decryption of RSA ciphertexts."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2024-2236",
+              "help": {
+                "text": "Vulnerability CVE-2024-2236\nSeverity: LOW\nPackage: libgcrypt20\nFixed Version: \nLink: [CVE-2024-2236](https://avd.aquasec.com/nvd/cve-2024-2236)\nA timing-based side-channel flaw was found in libgcrypt's RSA implementation. This issue may allow a remote attacker to initiate a Bleichenbacher-style attack, which can lead to the decryption of RSA ciphertexts.",
+                "markdown": "**Vulnerability CVE-2024-2236**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libgcrypt20||[CVE-2024-2236](https://avd.aquasec.com/nvd/cve-2024-2236)|\n\nA timing-based side-channel flaw was found in libgcrypt's RSA implementation. This issue may allow a remote attacker to initiate a Bleichenbacher-style attack, which can lead to the decryption of RSA ciphertexts."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2023-50495",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "ncurses: segmentation fault via _nc_wrap_entry()"
+              },
+              "fullDescription": {
+                "text": "NCurse v6.4-20230418 was discovered to contain a segmentation fault via the component _nc_wrap_entry()."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2023-50495",
+              "help": {
+                "text": "Vulnerability CVE-2023-50495\nSeverity: LOW\nPackage: ncurses-bin\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)\nNCurse v6.4-20230418 was discovered to contain a segmentation fault via the component _nc_wrap_entry().",
+                "markdown": "**Vulnerability CVE-2023-50495**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|ncurses-bin||[CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)|\n\nNCurse v6.4-20230418 was discovered to contain a segmentation fault via the component _nc_wrap_entry()."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-13757",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "p11-kit: Stack exhaustion via unbounded recursion in RPC attribute parsing"
+              },
+              "fullDescription": {
+                "text": "A flaw was found in p11-kit. The RPC message attribute parsing functions p11_rpc_message_get_attribute() and p11_rpc_message_get_attribute_array_value() form a mutually-recursive call chain with no recursion depth limit when processing nested CKA_WRAP_TEMPLATE, CKA_UNWRAP_TEMPLATE, and CKA_DERIVE_TEMPLATE attributes. An unauthenticated attacker with local access to the p11-kit RPC Unix domain socket can send a specially crafted request with deeply nested template attributes, causing stack exhaustion and crashing the p11-kit server process and its dependent services."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-13757",
+              "help": {
+                "text": "Vulnerability CVE-2026-13757\nSeverity: MEDIUM\nPackage: p11-kit-modules\nFixed Version: \nLink: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)\nA flaw was found in p11-kit. The RPC message attribute parsing functions p11_rpc_message_get_attribute() and p11_rpc_message_get_attribute_array_value() form a mutually-recursive call chain with no recursion depth limit when processing nested CKA_WRAP_TEMPLATE, CKA_UNWRAP_TEMPLATE, and CKA_DERIVE_TEMPLATE attributes. An unauthenticated attacker with local access to the p11-kit RPC Unix domain socket can send a specially crafted request with deeply nested template attributes, causing stack exhaustion and crashing the p11-kit server process and its dependent services.",
+                "markdown": "**Vulnerability CVE-2026-13757**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|p11-kit-modules||[CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)|\n\nA flaw was found in p11-kit. The RPC message attribute parsing functions p11_rpc_message_get_attribute() and p11_rpc_message_get_attribute_array_value() form a mutually-recursive call chain with no recursion depth limit when processing nested CKA_WRAP_TEMPLATE, CKA_UNWRAP_TEMPLATE, and CKA_DERIVE_TEMPLATE attributes. An unauthenticated attacker with local access to the p11-kit RPC Unix domain socket can send a specially crafted request with deeply nested template attributes, causing stack exhaustion and crashing the p11-kit server process and its dependent services."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2022-41409",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "pcre2: negative repeat value in a pcre2test subject line leads to inifinite loop"
+              },
+              "fullDescription": {
+                "text": "Integer overflow vulnerability in pcre2test before 10.41 allows attackers to cause a denial of service or other unspecified impacts via negative input."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2022-41409",
+              "help": {
+                "text": "Vulnerability CVE-2022-41409\nSeverity: LOW\nPackage: libpcre2-8-0\nFixed Version: \nLink: [CVE-2022-41409](https://avd.aquasec.com/nvd/cve-2022-41409)\nInteger overflow vulnerability in pcre2test before 10.41 allows attackers to cause a denial of service or other unspecified impacts via negative input.",
+                "markdown": "**Vulnerability CVE-2022-41409**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libpcre2-8-0||[CVE-2022-41409](https://avd.aquasec.com/nvd/cve-2022-41409)|\n\nInteger overflow vulnerability in pcre2test before 10.41 allows attackers to cause a denial of service or other unspecified impacts via negative input."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2017-11164",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "pcre: OP_KETRMAX feature in the match function in pcre_exec.c"
+              },
+              "fullDescription": {
+                "text": "In PCRE 8.41, the OP_KETRMAX feature in the match function in pcre_exec.c allows stack exhaustion (uncontrolled recursion) when processing a crafted regular expression."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2017-11164",
+              "help": {
+                "text": "Vulnerability CVE-2017-11164\nSeverity: LOW\nPackage: libpcre3\nFixed Version: \nLink: [CVE-2017-11164](https://avd.aquasec.com/nvd/cve-2017-11164)\nIn PCRE 8.41, the OP_KETRMAX feature in the match function in pcre_exec.c allows stack exhaustion (uncontrolled recursion) when processing a crafted regular expression.",
+                "markdown": "**Vulnerability CVE-2017-11164**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libpcre3||[CVE-2017-11164](https://avd.aquasec.com/nvd/cve-2017-11164)|\n\nIn PCRE 8.41, the OP_KETRMAX feature in the match function in pcre_exec.c allows stack exhaustion (uncontrolled recursion) when processing a crafted regular expression."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-40930",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "LIBPNG is a reference library for use in applications that process PNG ..."
+              },
+              "fullDescription": {
+                "text": "LIBPNG is a reference library for use in applications that process PNG (Portable Network Graphics) raster image files. In version 1.8.0, three inter-frame chunk discard paths in the push-mode APNG parser clear the chunk-header flag without consuming the chunk body and CRC, allowing attacker-controlled bytes inside an ignored ancillary chunk to be reinterpreted as a fresh chunk header on the next call to `png_process_data`. Commit faf06924688b62d7c1654b5ceddedbde66ffadb4 fixes the issue."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-40930",
+              "help": {
+                "text": "Vulnerability CVE-2026-40930\nSeverity: MEDIUM\nPackage: libpng16-16\nFixed Version: \nLink: [CVE-2026-40930](https://avd.aquasec.com/nvd/cve-2026-40930)\nLIBPNG is a reference library for use in applications that process PNG (Portable Network Graphics) raster image files. In version 1.8.0, three inter-frame chunk discard paths in the push-mode APNG parser clear the chunk-header flag without consuming the chunk body and CRC, allowing attacker-controlled bytes inside an ignored ancillary chunk to be reinterpreted as a fresh chunk header on the next call to `png_process_data`. Commit faf06924688b62d7c1654b5ceddedbde66ffadb4 fixes the issue.",
+                "markdown": "**Vulnerability CVE-2026-40930**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|libpng16-16||[CVE-2026-40930](https://avd.aquasec.com/nvd/cve-2026-40930)|\n\nLIBPNG is a reference library for use in applications that process PNG (Portable Network Graphics) raster image files. In version 1.8.0, three inter-frame chunk discard paths in the push-mode APNG parser clear the chunk-header flag without consuming the chunk body and CRC, allowing attacker-controlled bytes inside an ignored ancillary chunk to be reinterpreted as a fresh chunk header on the next call to `png_process_data`. Commit faf06924688b62d7c1654b5ceddedbde66ffadb4 fixes the issue."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-40228",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "systemd: systemd-journald: Unintended output to user terminals via logger command"
+              },
+              "fullDescription": {
+                "text": "In systemd 259, systemd-journald can send ANSI escape sequences to the terminals of arbitrary users when a \"logger -p emerg\" command is executed, if ForwardToWall=yes is set."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-40228",
+              "help": {
+                "text": "Vulnerability CVE-2026-40228\nSeverity: LOW\nPackage: libudev1\nFixed Version: \nLink: [CVE-2026-40228](https://avd.aquasec.com/nvd/cve-2026-40228)\nIn systemd 259, systemd-journald can send ANSI escape sequences to the terminals of arbitrary users when a \"logger -p emerg\" command is executed, if ForwardToWall=yes is set.",
+                "markdown": "**Vulnerability CVE-2026-40228**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libudev1||[CVE-2026-40228](https://avd.aquasec.com/nvd/cve-2026-40228)|\n\nIn systemd 259, systemd-journald can send ANSI escape sequences to the terminals of arbitrary users when a \"logger -p emerg\" command is executed, if ForwardToWall=yes is set."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2022-4899",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "zstd: mysql: buffer overrun in util.c"
+              },
+              "fullDescription": {
+                "text": "A vulnerability was found in zstd v1.4.10, where an attacker can supply empty string as an argument to the command line tool to cause buffer overrun."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2022-4899",
+              "help": {
+                "text": "Vulnerability CVE-2022-4899\nSeverity: LOW\nPackage: libzstd1\nFixed Version: \nLink: [CVE-2022-4899](https://avd.aquasec.com/nvd/cve-2022-4899)\nA vulnerability was found in zstd v1.4.10, where an attacker can supply empty string as an argument to the command line tool to cause buffer overrun.",
+                "markdown": "**Vulnerability CVE-2022-4899**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|libzstd1||[CVE-2022-4899](https://avd.aquasec.com/nvd/cve-2022-4899)|\n\nA vulnerability was found in zstd v1.4.10, where an attacker can supply empty string as an argument to the command line tool to cause buffer overrun."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2023-29383",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "shadow: Improper input validation in shadow-utils package utility chfn"
+              },
+              "fullDescription": {
+                "text": "In Shadow 4.13, it is possible to inject control characters into fields provided to the SUID program chfn (change finger). Although it is not possible to exploit this directly (e.g., adding a new user fails because \\n is in the block list), it is possible to misrepresent the /etc/passwd file when viewed. Use of \\r manipulations and Unicode characters to work around blocking of the : character make it possible to give the impression that a new user has been added. In other words, an adversary may be able to convince a system administrator to take the system offline (an indirect, social-engineered denial of service) by demonstrating that \"cat /etc/passwd\" shows a rogue user account."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2023-29383",
+              "help": {
+                "text": "Vulnerability CVE-2023-29383\nSeverity: LOW\nPackage: passwd\nFixed Version: \nLink: [CVE-2023-29383](https://avd.aquasec.com/nvd/cve-2023-29383)\nIn Shadow 4.13, it is possible to inject control characters into fields provided to the SUID program chfn (change finger). Although it is not possible to exploit this directly (e.g., adding a new user fails because \\n is in the block list), it is possible to misrepresent the /etc/passwd file when viewed. Use of \\r manipulations and Unicode characters to work around blocking of the : character make it possible to give the impression that a new user has been added. In other words, an adversary may be able to convince a system administrator to take the system offline (an indirect, social-engineered denial of service) by demonstrating that \"cat /etc/passwd\" shows a rogue user account.",
+                "markdown": "**Vulnerability CVE-2023-29383**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|passwd||[CVE-2023-29383](https://avd.aquasec.com/nvd/cve-2023-29383)|\n\nIn Shadow 4.13, it is possible to inject control characters into fields provided to the SUID program chfn (change finger). Although it is not possible to exploit this directly (e.g., adding a new user fails because \\n is in the block list), it is possible to misrepresent the /etc/passwd file when viewed. Use of \\r manipulations and Unicode characters to work around blocking of the : character make it possible to give the impression that a new user has been added. In other words, an adversary may be able to convince a system administrator to take the system offline (an indirect, social-engineered denial of service) by demonstrating that \"cat /etc/passwd\" shows a rogue user account."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2024-56433",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "shadow-utils: Default subordinate ID configuration in /etc/login.defs could lead to compromise"
+              },
+              "fullDescription": {
+                "text": "shadow-utils (aka shadow) 4.4 through 4.17.0 establishes a default /etc/subuid behavior (e.g., uid 100000 through 165535 for the first user account) that can realistically conflict with the uids of users defined on locally administered networks, potentially leading to account takeover, e.g., by leveraging newuidmap for access to an NFS home directory (or same-host resources in the case of remote logins by these local network users). NOTE: it may also be argued that system administrators should not have assigned uids, within local networks, that are within the range that can occur in /etc/subuid."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2024-56433",
+              "help": {
+                "text": "Vulnerability CVE-2024-56433\nSeverity: LOW\nPackage: passwd\nFixed Version: \nLink: [CVE-2024-56433](https://avd.aquasec.com/nvd/cve-2024-56433)\nshadow-utils (aka shadow) 4.4 through 4.17.0 establishes a default /etc/subuid behavior (e.g., uid 100000 through 165535 for the first user account) that can realistically conflict with the uids of users defined on locally administered networks, potentially leading to account takeover, e.g., by leveraging newuidmap for access to an NFS home directory (or same-host resources in the case of remote logins by these local network users). NOTE: it may also be argued that system administrators should not have assigned uids, within local networks, that are within the range that can occur in /etc/subuid.",
+                "markdown": "**Vulnerability CVE-2024-56433**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|passwd||[CVE-2024-56433](https://avd.aquasec.com/nvd/cve-2024-56433)|\n\nshadow-utils (aka shadow) 4.4 through 4.17.0 establishes a default /etc/subuid behavior (e.g., uid 100000 through 165535 for the first user account) that can realistically conflict with the uids of users defined on locally administered networks, potentially leading to account takeover, e.g., by leveraging newuidmap for access to an NFS home directory (or same-host resources in the case of remote logins by these local network users). NOTE: it may also be argued that system administrators should not have assigned uids, within local networks, that are within the range that can occur in /etc/subuid."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2021-31879",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "wget: authorization header disclosure on redirect"
+              },
+              "fullDescription": {
+                "text": "GNU Wget through 1.21.1 does not omit the Authorization header upon a redirect to a different origin, a related issue to CVE-2018-1000007."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2021-31879",
+              "help": {
+                "text": "Vulnerability CVE-2021-31879\nSeverity: MEDIUM\nPackage: wget\nFixed Version: \nLink: [CVE-2021-31879](https://avd.aquasec.com/nvd/cve-2021-31879)\nGNU Wget through 1.21.1 does not omit the Authorization header upon a redirect to a different origin, a related issue to CVE-2018-1000007.",
+                "markdown": "**Vulnerability CVE-2021-31879**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|wget||[CVE-2021-31879](https://avd.aquasec.com/nvd/cve-2021-31879)|\n\nGNU Wget through 1.21.1 does not omit the Authorization header upon a redirect to a different origin, a related issue to CVE-2018-1000007."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-58469",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit 37a40fc, contains a heap buff ..."
+              },
+              "fullDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit 37a40fc, contains a heap buffer underread vulnerability in the clean_metalink_string() function within src/metalink.c that allows a malicious server to trigger memory corruption by serving a Metalink document containing a whitespace-only URL. Attackers can cause the function to decrement a pointer past the start of the buffer when processing an all-whitespace Metalink URL, potentially leading to abnormal program behavior."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-58469",
+              "help": {
+                "text": "Vulnerability CVE-2026-58469\nSeverity: MEDIUM\nPackage: wget\nFixed Version: \nLink: [CVE-2026-58469](https://avd.aquasec.com/nvd/cve-2026-58469)\nGNU Wget through 1.25.0, fixed in commit 37a40fc, contains a heap buffer underread vulnerability in the clean_metalink_string() function within src/metalink.c that allows a malicious server to trigger memory corruption by serving a Metalink document containing a whitespace-only URL. Attackers can cause the function to decrement a pointer past the start of the buffer when processing an all-whitespace Metalink URL, potentially leading to abnormal program behavior.",
+                "markdown": "**Vulnerability CVE-2026-58469**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|wget||[CVE-2026-58469](https://avd.aquasec.com/nvd/cve-2026-58469)|\n\nGNU Wget through 1.25.0, fixed in commit 37a40fc, contains a heap buffer underread vulnerability in the clean_metalink_string() function within src/metalink.c that allows a malicious server to trigger memory corruption by serving a Metalink document containing a whitespace-only URL. Attackers can cause the function to decrement a pointer past the start of the buffer when processing an all-whitespace Metalink URL, potentially leading to abnormal program behavior."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-58470",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit 43d3ba9, contains an integer  ..."
+              },
+              "fullDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit 43d3ba9, contains an integer overflow vulnerability in the parse_content_range() function within src/http.c that allows server-controlled values to cause signed integer arithmetic to overflow. Attackers can supply malicious Content-Range header values to trigger undefined behavior and download desynchronization in the affected client."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-58470",
+              "help": {
+                "text": "Vulnerability CVE-2026-58470\nSeverity: MEDIUM\nPackage: wget\nFixed Version: \nLink: [CVE-2026-58470](https://avd.aquasec.com/nvd/cve-2026-58470)\nGNU Wget through 1.25.0, fixed in commit 43d3ba9, contains an integer overflow vulnerability in the parse_content_range() function within src/http.c that allows server-controlled values to cause signed integer arithmetic to overflow. Attackers can supply malicious Content-Range header values to trigger undefined behavior and download desynchronization in the affected client.",
+                "markdown": "**Vulnerability CVE-2026-58470**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|wget||[CVE-2026-58470](https://avd.aquasec.com/nvd/cve-2026-58470)|\n\nGNU Wget through 1.25.0, fixed in commit 43d3ba9, contains an integer overflow vulnerability in the parse_content_range() function within src/http.c that allows server-controlled values to cause signed integer arithmetic to overflow. Attackers can supply malicious Content-Range header values to trigger undefined behavior and download desynchronization in the affected client."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-58471",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "wget: GNU Wget: Heap buffer overflow via server-supplied filename leads to memory corruption"
+              },
+              "fullDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit c2640fe, contains a heap buffer overflow vulnerability in the convert_fname() function within src/url.c that allows remote attackers to trigger memory corruption through a server-supplied filename requiring character set conversion. When the output buffer is too small during iconv E2BIG reallocation, the reallocation logic miscalculates the remaining space, leading to a heap buffer overflow that can be exploited via a maliciously crafted server response."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-58471",
+              "help": {
+                "text": "Vulnerability CVE-2026-58471\nSeverity: MEDIUM\nPackage: wget\nFixed Version: \nLink: [CVE-2026-58471](https://avd.aquasec.com/nvd/cve-2026-58471)\nGNU Wget through 1.25.0, fixed in commit c2640fe, contains a heap buffer overflow vulnerability in the convert_fname() function within src/url.c that allows remote attackers to trigger memory corruption through a server-supplied filename requiring character set conversion. When the output buffer is too small during iconv E2BIG reallocation, the reallocation logic miscalculates the remaining space, leading to a heap buffer overflow that can be exploited via a maliciously crafted server response.",
+                "markdown": "**Vulnerability CVE-2026-58471**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|wget||[CVE-2026-58471](https://avd.aquasec.com/nvd/cve-2026-58471)|\n\nGNU Wget through 1.25.0, fixed in commit c2640fe, contains a heap buffer overflow vulnerability in the convert_fname() function within src/url.c that allows remote attackers to trigger memory corruption through a server-supplied filename requiring character set conversion. When the output buffer is too small during iconv E2BIG reallocation, the reallocation logic miscalculates the remaining space, leading to a heap buffer overflow that can be exploited via a maliciously crafted server response."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-58472",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit dd692d9, contains a heap buff ..."
+              },
+              "fullDescription": {
+                "text": "GNU Wget through 1.25.0, fixed in commit dd692d9, contains a heap buffer overflow vulnerability in the html_quote_string() function in src/convert.c that allows a remote attacker to trigger memory corruption by supplying a crafted HTML attribute with a large number of characters requiring entity encoding. A server-supplied HTML attribute causes a signed integer counter to overflow during output size accumulation, resulting in an undersized heap allocation and subsequent heap buffer overflow during the copy phase."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-58472",
+              "help": {
+                "text": "Vulnerability CVE-2026-58472\nSeverity: MEDIUM\nPackage: wget\nFixed Version: \nLink: [CVE-2026-58472](https://avd.aquasec.com/nvd/cve-2026-58472)\nGNU Wget through 1.25.0, fixed in commit dd692d9, contains a heap buffer overflow vulnerability in the html_quote_string() function in src/convert.c that allows a remote attacker to trigger memory corruption by supplying a crafted HTML attribute with a large number of characters requiring entity encoding. A server-supplied HTML attribute causes a signed integer counter to overflow during output size accumulation, resulting in an undersized heap allocation and subsequent heap buffer overflow during the copy phase.",
+                "markdown": "**Vulnerability CVE-2026-58472**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|wget||[CVE-2026-58472](https://avd.aquasec.com/nvd/cve-2026-58472)|\n\nGNU Wget through 1.25.0, fixed in commit dd692d9, contains a heap buffer overflow vulnerability in the html_quote_string() function in src/convert.c that allows a remote attacker to trigger memory corruption by supplying a crafted HTML attribute with a large number of characters requiring entity encoding. A server-supplied HTML attribute causes a signed integer counter to overflow during output size accumulation, resulting in an undersized heap allocation and subsequent heap buffer overflow during the copy phase."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "5.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-10532",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback ..."
+              },
+              "fullDescription": {
+                "text": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-10532",
+              "help": {
+                "text": "Vulnerability CVE-2026-10532\nSeverity: LOW\nPackage: ch.qos.logback:logback-core\nFixed Version: 1.5.35\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive.",
+                "markdown": "**Vulnerability CVE-2026-10532**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|ch.qos.logback:logback-core|1.5.35|[CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)|\n\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive."
+              },
+              "properties": {
+                "cvssv40_baseScore": 2.9,
+                "cvssv40_vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N/E:P/RE:M/U:Green",
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-9828",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback ..."
+              },
+              "fullDescription": {
+                "text": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate objects from\n classes in the java.lang and java.util packages that are not explicitly\n blocked.\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.32 inclusive."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-9828",
+              "help": {
+                "text": "Vulnerability CVE-2026-9828\nSeverity: LOW\nPackage: ch.qos.logback:logback-core\nFixed Version: 1.5.33\nLink: [CVE-2026-9828](https://avd.aquasec.com/nvd/cve-2026-9828)\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate objects from\n classes in the java.lang and java.util packages that are not explicitly\n blocked.\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.32 inclusive.",
+                "markdown": "**Vulnerability CVE-2026-9828**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|ch.qos.logback:logback-core|1.5.33|[CVE-2026-9828](https://avd.aquasec.com/nvd/cve-2026-9828)|\n\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate objects from\n classes in the java.lang and java.util packages that are not explicitly\n blocked.\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.32 inclusive."
+              },
+              "properties": {
+                "cvssv40_baseScore": 1.2,
+                "cvssv40_vector": "CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N/E:P/RE:L/U:Green",
+                "precision": "very-high",
+                "security-severity": "2.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "LOW"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54512",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Arbitrary code execution via PolymorphicTypeValidator bypass"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, jackson-databind's PolymorphicTypeValidator (PTV) is the primary safety mechanism guarding polymorphic deserialization. When polymorphic typing is enabled and a type identifier contains generic parameters (i.e. the type ID string contains \u003c), DatabindContext._resolveAndValidateGeneric() validates only the raw container class name (the substring before \u003c) against the configured PTV. If the container type is approved, the method parses the full canonical type string via TypeFactory.constructFromCanonical() and returns the fully parameterized type without ever validating the nested type arguments against the PTV. The nested type arguments are then resolved, instantiated, and populated as beans during deserialization. An attacker who controls the type ID can therefore place a denied class as a generic type parameter of an allowed container — for example java.util.ArrayList\u003ccom.evil.Gadget\u003e when only java.util.ArrayList is allow-listed. The container passes the PTV check; com.evil.Gadget is loaded via Class.forName(name, true, loader), instantiated, and its properties are set from attacker-controlled JSON. This completely bypasses an explicitly configured PTV allow-list. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54512",
+              "help": {
+                "text": "Vulnerability CVE-2026-54512\nSeverity: HIGH\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.18.8, 3.1.4, 2.21.4\nLink: [CVE-2026-54512](https://avd.aquasec.com/nvd/cve-2026-54512)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, jackson-databind's PolymorphicTypeValidator (PTV) is the primary safety mechanism guarding polymorphic deserialization. When polymorphic typing is enabled and a type identifier contains generic parameters (i.e. the type ID string contains \u003c), DatabindContext._resolveAndValidateGeneric() validates only the raw container class name (the substring before \u003c) against the configured PTV. If the container type is approved, the method parses the full canonical type string via TypeFactory.constructFromCanonical() and returns the fully parameterized type without ever validating the nested type arguments against the PTV. The nested type arguments are then resolved, instantiated, and populated as beans during deserialization. An attacker who controls the type ID can therefore place a denied class as a generic type parameter of an allowed container — for example java.util.ArrayList\u003ccom.evil.Gadget\u003e when only java.util.ArrayList is allow-listed. The container passes the PTV check; com.evil.Gadget is loaded via Class.forName(name, true, loader), instantiated, and its properties are set from attacker-controlled JSON. This completely bypasses an explicitly configured PTV allow-list. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54512**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|HIGH|com.fasterxml.jackson.core:jackson-databind|2.18.8, 3.1.4, 2.21.4|[CVE-2026-54512](https://avd.aquasec.com/nvd/cve-2026-54512)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, jackson-databind's PolymorphicTypeValidator (PTV) is the primary safety mechanism guarding polymorphic deserialization. When polymorphic typing is enabled and a type identifier contains generic parameters (i.e. the type ID string contains \u003c), DatabindContext._resolveAndValidateGeneric() validates only the raw container class name (the substring before \u003c) against the configured PTV. If the container type is approved, the method parses the full canonical type string via TypeFactory.constructFromCanonical() and returns the fully parameterized type without ever validating the nested type arguments against the PTV. The nested type arguments are then resolved, instantiated, and populated as beans during deserialization. An attacker who controls the type ID can therefore place a denied class as a generic type parameter of an allowed container — for example java.util.ArrayList\u003ccom.evil.Gadget\u003e when only java.util.ArrayList is allow-listed. The container passes the PTV check; com.evil.Gadget is loaded via Class.forName(name, true, loader), instantiated, and its properties are set from attacker-controlled JSON. This completely bypasses an explicitly configured PTV allow-list. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 8.1,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "precision": "very-high",
+                "security-severity": "8.1",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "HIGH"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54513",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: Jackson-databind: Security bypass allows arbitrary code execution"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists any array type based only on clazz.isArray(), without validating the array's component (element) type against the configured allowlist. A PTV built with allowIfSubTypeIsArray() plus an explicit concrete-type allowlist therefore still permits EvilType[] even though EvilType is not allowlisted. When Jackson deserializes the elements and no per-element type IDs are present, it instantiates the component type directly with no further PTV check, bypassing the allowlist. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54513",
+              "help": {
+                "text": "Vulnerability CVE-2026-54513\nSeverity: HIGH\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.18.8, 2.21.4, 3.1.4\nLink: [CVE-2026-54513](https://avd.aquasec.com/nvd/cve-2026-54513)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists any array type based only on clazz.isArray(), without validating the array's component (element) type against the configured allowlist. A PTV built with allowIfSubTypeIsArray() plus an explicit concrete-type allowlist therefore still permits EvilType[] even though EvilType is not allowlisted. When Jackson deserializes the elements and no per-element type IDs are present, it instantiates the component type directly with no further PTV check, bypassing the allowlist. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54513**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|HIGH|com.fasterxml.jackson.core:jackson-databind|2.18.8, 2.21.4, 3.1.4|[CVE-2026-54513](https://avd.aquasec.com/nvd/cve-2026-54513)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists any array type based only on clazz.isArray(), without validating the array's component (element) type against the configured allowlist. A PTV built with allowIfSubTypeIsArray() plus an explicit concrete-type allowlist therefore still permits EvilType[] even though EvilType is not allowlisted. When Jackson deserializes the elements and no per-element type IDs are present, it instantiates the component type directly with no further PTV check, bypassing the allowlist. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 8.1,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "precision": "very-high",
+                "security-severity": "8.1",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "HIGH"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54514",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Information Disclosure via Eager DNS Resolution"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.0.0 until 2.18.8, 2.21.4, and 3.1.4, JDKFromStringDeserializer constructed InetSocketAddress with new InetSocketAddress(host, port), which performs eager DNS name resolution for hostname inputs at deserialization time. An application that binds untrusted JSON into a type containing an InetSocketAddress field issues an attacker-chosen DNS query during readValue, before any application-level validation or connect logic. The fix uses InetSocketAddress.createUnresolved(host, port), deferring DNS to an explicit connect. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54514",
+              "help": {
+                "text": "Vulnerability CVE-2026-54514\nSeverity: MEDIUM\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.18.8, 2.21.4, 3.1.4\nLink: [CVE-2026-54514](https://avd.aquasec.com/nvd/cve-2026-54514)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.0.0 until 2.18.8, 2.21.4, and 3.1.4, JDKFromStringDeserializer constructed InetSocketAddress with new InetSocketAddress(host, port), which performs eager DNS name resolution for hostname inputs at deserialization time. An application that binds untrusted JSON into a type containing an InetSocketAddress field issues an attacker-chosen DNS query during readValue, before any application-level validation or connect logic. The fix uses InetSocketAddress.createUnresolved(host, port), deferring DNS to an explicit connect. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54514**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|com.fasterxml.jackson.core:jackson-databind|2.18.8, 2.21.4, 3.1.4|[CVE-2026-54514](https://avd.aquasec.com/nvd/cve-2026-54514)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.0.0 until 2.18.8, 2.21.4, and 3.1.4, JDKFromStringDeserializer constructed InetSocketAddress with new InetSocketAddress(host, port), which performs eager DNS name resolution for hostname inputs at deserialization time. An application that binds untrusted JSON into a type containing an InetSocketAddress field issues an attacker-chosen DNS query during readValue, before any application-level validation or connect logic. The fix uses InetSocketAddress.createUnresolved(host, port), deferring DNS to an explicit connect. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 5.3,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                "precision": "very-high",
+                "security-severity": "5.3",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54515",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Ignored properties can be unexpectedly modified"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.8.0 until 2.18.9, 2.21.5, and 3.1.4, in BeanDeserializerBase.createContextual(), per-property @JsonIgnoreProperties exclusions are applied by _handleByNameInclusion(), producing a contextual deserializer whose BeanPropertyMap has the ignored properties removed. The subsequent per-property case-insensitivity block (triggered by @JsonFormat(ACCEPT_CASE_INSENSITIVE_PROPERTIES)) rebuilds from this._beanProperties (the original, unfiltered map) instead of contextual._beanProperties, then overwrites the filtered map — restoring every property _handleByNameInclusion had just removed. The ignored property becomes writable again. This vulnerability is fixed in 2.18.9, 2.21.5, and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54515",
+              "help": {
+                "text": "Vulnerability CVE-2026-54515\nSeverity: MEDIUM\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 3.1.4, 2.18.9, 2.21.5, 2.22.1\nLink: [CVE-2026-54515](https://avd.aquasec.com/nvd/cve-2026-54515)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.8.0 until 2.18.9, 2.21.5, and 3.1.4, in BeanDeserializerBase.createContextual(), per-property @JsonIgnoreProperties exclusions are applied by _handleByNameInclusion(), producing a contextual deserializer whose BeanPropertyMap has the ignored properties removed. The subsequent per-property case-insensitivity block (triggered by @JsonFormat(ACCEPT_CASE_INSENSITIVE_PROPERTIES)) rebuilds from this._beanProperties (the original, unfiltered map) instead of contextual._beanProperties, then overwrites the filtered map — restoring every property _handleByNameInclusion had just removed. The ignored property becomes writable again. This vulnerability is fixed in 2.18.9, 2.21.5, and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54515**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|com.fasterxml.jackson.core:jackson-databind|3.1.4, 2.18.9, 2.21.5, 2.22.1|[CVE-2026-54515](https://avd.aquasec.com/nvd/cve-2026-54515)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.8.0 until 2.18.9, 2.21.5, and 3.1.4, in BeanDeserializerBase.createContextual(), per-property @JsonIgnoreProperties exclusions are applied by _handleByNameInclusion(), producing a contextual deserializer whose BeanPropertyMap has the ignored properties removed. The subsequent per-property case-insensitivity block (triggered by @JsonFormat(ACCEPT_CASE_INSENSITIVE_PROPERTIES)) rebuilds from this._beanProperties (the original, unfiltered map) instead of contextual._beanProperties, then overwrites the filtered map — restoring every property _handleByNameInclusion had just removed. The ignored property becomes writable again. This vulnerability is fixed in 2.18.9, 2.21.5, and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 5.3,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                "precision": "very-high",
+                "security-severity": "5.3",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54516",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Security bypass due to improper handling of renamed properties"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, POJOPropertiesCollector._renameProperties() allows a property with @JsonProperty(\"renamed\") on the getter and @JsonIgnore on the setter to be renamed rather than dropped. With MapperFeature.INFER_PROPERTY_MUTATORS enabled (default), the private backing field is retained; during deserialization BeanDeserializerFactory.addBeanProps() sees hasField()==true, builds a FieldProperty, and makes the backing field writable. An attacker supplying the renamed JSON key writes the backing field directly, bypassing the @JsonIgnore on the setter. This vulnerability is fixed in 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54516",
+              "help": {
+                "text": "Vulnerability CVE-2026-54516\nSeverity: MEDIUM\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.21.4, 3.1.4\nLink: [CVE-2026-54516](https://avd.aquasec.com/nvd/cve-2026-54516)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, POJOPropertiesCollector._renameProperties() allows a property with @JsonProperty(\"renamed\") on the getter and @JsonIgnore on the setter to be renamed rather than dropped. With MapperFeature.INFER_PROPERTY_MUTATORS enabled (default), the private backing field is retained; during deserialization BeanDeserializerFactory.addBeanProps() sees hasField()==true, builds a FieldProperty, and makes the backing field writable. An attacker supplying the renamed JSON key writes the backing field directly, bypassing the @JsonIgnore on the setter. This vulnerability is fixed in 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54516**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|com.fasterxml.jackson.core:jackson-databind|2.21.4, 3.1.4|[CVE-2026-54516](https://avd.aquasec.com/nvd/cve-2026-54516)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, POJOPropertiesCollector._renameProperties() allows a property with @JsonProperty(\"renamed\") on the getter and @JsonIgnore on the setter to be renamed rather than dropped. With MapperFeature.INFER_PROPERTY_MUTATORS enabled (default), the private backing field is retained; during deserialization BeanDeserializerFactory.addBeanProps() sees hasField()==true, builds a FieldProperty, and makes the backing field writable. An attacker supplying the renamed JSON key writes the backing field directly, bypassing the @JsonIgnore on the setter. This vulnerability is fixed in 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 5.3,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                "precision": "very-high",
+                "security-severity": "5.3",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54517",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Information disclosure via improper JsonView filter application"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, in BeanDeserializer._deserializeUsingPropertyBased, the active-view (@JsonView) filter was applied only to creator properties; the regular property-buffering branch performed no prop.visibleInView(activeView) check. A change making SetterlessProperty.isMerging() return true routed setterless Collection/Map properties through this unguarded path, so a setterless collection annotated with a restricted @JsonView is populated from attacker JSON even when the active view excludes it. This vulnerability is fixed in 2.21.4 and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54517",
+              "help": {
+                "text": "Vulnerability CVE-2026-54517\nSeverity: MEDIUM\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.21.4, 3.1.4\nLink: [CVE-2026-54517](https://avd.aquasec.com/nvd/cve-2026-54517)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, in BeanDeserializer._deserializeUsingPropertyBased, the active-view (@JsonView) filter was applied only to creator properties; the regular property-buffering branch performed no prop.visibleInView(activeView) check. A change making SetterlessProperty.isMerging() return true routed setterless Collection/Map properties through this unguarded path, so a setterless collection annotated with a restricted @JsonView is populated from attacker JSON even when the active view excludes it. This vulnerability is fixed in 2.21.4 and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54517**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|com.fasterxml.jackson.core:jackson-databind|2.21.4, 3.1.4|[CVE-2026-54517](https://avd.aquasec.com/nvd/cve-2026-54517)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, in BeanDeserializer._deserializeUsingPropertyBased, the active-view (@JsonView) filter was applied only to creator properties; the regular property-buffering branch performed no prop.visibleInView(activeView) check. A change making SetterlessProperty.isMerging() return true routed setterless Collection/Map properties through this unguarded path, so a setterless collection annotated with a restricted @JsonView is populated from attacker JSON even when the active view excludes it. This vulnerability is fixed in 2.21.4 and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 5.3,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                "precision": "very-high",
+                "security-severity": "5.3",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-54518",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "jackson-databind: jackson-databind: Information disclosure and data manipulation via view-based access control bypass"
+              },
+              "fullDescription": {
+                "text": "jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, UnwrappedPropertyHandler.processUnwrappedCreatorProperties() replays buffered JSON into creator parameters but never consults prop.visibleInView(activeView). The normal property-based creator path gates creator properties on the active view, but this unwrapped-creator replay path bypasses that check, so a constructor parameter annotated with both @JsonView(AdminView.class) and @JsonUnwrapped is populated from attacker JSON even when a more restrictive view is active. This vulnerability is fixed in 2.21.4 and 3.1.4."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-54518",
+              "help": {
+                "text": "Vulnerability CVE-2026-54518\nSeverity: MEDIUM\nPackage: com.fasterxml.jackson.core:jackson-databind\nFixed Version: 2.21.4\nLink: [CVE-2026-54518](https://avd.aquasec.com/nvd/cve-2026-54518)\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, UnwrappedPropertyHandler.processUnwrappedCreatorProperties() replays buffered JSON into creator parameters but never consults prop.visibleInView(activeView). The normal property-based creator path gates creator properties on the active view, but this unwrapped-creator replay path bypasses that check, so a constructor parameter annotated with both @JsonView(AdminView.class) and @JsonUnwrapped is populated from attacker JSON even when a more restrictive view is active. This vulnerability is fixed in 2.21.4 and 3.1.4.",
+                "markdown": "**Vulnerability CVE-2026-54518**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|com.fasterxml.jackson.core:jackson-databind|2.21.4|[CVE-2026-54518](https://avd.aquasec.com/nvd/cve-2026-54518)|\n\njackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, UnwrappedPropertyHandler.processUnwrappedCreatorProperties() replays buffered JSON into creator parameters but never consults prop.visibleInView(activeView). The normal property-based creator path gates creator properties on the active view, but this unwrapped-creator replay path bypasses that check, so a constructor parameter annotated with both @JsonView(AdminView.class) and @JsonUnwrapped is populated from attacker JSON even when a more restrictive view is active. This vulnerability is fixed in 2.21.4 and 3.1.4."
+              },
+              "properties": {
+                "cvssv3_baseScore": 6.5,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+                "precision": "very-high",
+                "security-severity": "6.5",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2026-47838",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "Spring Security Vulnerable to Unauthorized User Impersonation when Using X.509 Client Certificates"
+              },
+              "fullDescription": {
+                "text": "SubjectDnX509PrincipalExtractor does not correctly handle certain malformed X.509 certificate CN values, which can lead to reading the wrong value for the username. In a carefully crafted certificate, this can lead to an attacker impersonating another user.\n\nAffected versions:\nSpring Security 5.7.0 through 5.7.24; 5.8.0 through 5.8.26; 6.3.0 through 6.3.17; 6.4.0 through 6.4.17; 6.5.0 through 6.5.10."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-47838",
+              "help": {
+                "text": "Vulnerability CVE-2026-47838\nSeverity: MEDIUM\nPackage: org.springframework.security:spring-security-web\nFixed Version: 6.5.11\nLink: [CVE-2026-47838](https://avd.aquasec.com/nvd/cve-2026-47838)\nSubjectDnX509PrincipalExtractor does not correctly handle certain malformed X.509 certificate CN values, which can lead to reading the wrong value for the username. In a carefully crafted certificate, this can lead to an attacker impersonating another user.\n\nAffected versions:\nSpring Security 5.7.0 through 5.7.24; 5.8.0 through 5.8.26; 6.3.0 through 6.3.17; 6.4.0 through 6.4.17; 6.5.0 through 6.5.10.",
+                "markdown": "**Vulnerability CVE-2026-47838**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|org.springframework.security:spring-security-web|6.5.11|[CVE-2026-47838](https://avd.aquasec.com/nvd/cve-2026-47838)|\n\nSubjectDnX509PrincipalExtractor does not correctly handle certain malformed X.509 certificate CN values, which can lead to reading the wrong value for the username. In a carefully crafted certificate, this can lead to an attacker impersonating another user.\n\nAffected versions:\nSpring Security 5.7.0 through 5.7.24; 5.8.0 through 5.8.26; 6.3.0 through 6.3.17; 6.4.0 through 6.4.17; 6.5.0 through 6.5.10."
+              },
+              "properties": {
+                "cvssv3_baseScore": 6.8,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:N",
+                "precision": "very-high",
+                "security-severity": "6.8",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            }
+          ],
+          "version": "0.72.0"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: bsdutils\nInstalled Version: 1:2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: bsdutils@1:2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-27943",
+          "ruleIndex": 1,
+          "level": "note",
+          "message": {
+            "text": "Package: gcc-12-base\nInstalled Version: 12.3.0-1ubuntu1~22.04.3\nVulnerability CVE-2022-27943\nSeverity: LOW\nFixed Version: \nLink: [CVE-2022-27943](https://avd.aquasec.com/nvd/cve-2022-27943)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: gcc-12-base@12.3.0-1ubuntu1~22.04.3"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: libblkid1\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libblkid1@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-4046",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc-bin\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-4046\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc-bin@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-5435",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc-bin\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-5435\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc-bin@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-6238",
+          "ruleIndex": 4,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc-bin\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-6238\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc-bin@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-4046",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc6\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-4046\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc6@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-5435",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc6\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-5435\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc6@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-6238",
+          "ruleIndex": 4,
+          "level": "warning",
+          "message": {
+            "text": "Package: libc6\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-6238\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libc6@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2025-66382",
+          "ruleIndex": 5,
+          "level": "warning",
+          "message": {
+            "text": "Package: libexpat1\nInstalled Version: 2.4.7-1ubuntu0.7\nVulnerability CVE-2025-66382\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2025-66382](https://avd.aquasec.com/nvd/cve-2025-66382)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libexpat1@2.4.7-1ubuntu0.7"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-27943",
+          "ruleIndex": 1,
+          "level": "note",
+          "message": {
+            "text": "Package: libgcc-s1\nInstalled Version: 12.3.0-1ubuntu1~22.04.3\nVulnerability CVE-2022-27943\nSeverity: LOW\nFixed Version: \nLink: [CVE-2022-27943](https://avd.aquasec.com/nvd/cve-2022-27943)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libgcc-s1@12.3.0-1ubuntu1~22.04.3"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2024-2236",
+          "ruleIndex": 6,
+          "level": "note",
+          "message": {
+            "text": "Package: libgcrypt20\nInstalled Version: 1.9.4-3ubuntu3.2\nVulnerability CVE-2024-2236\nSeverity: LOW\nFixed Version: \nLink: [CVE-2024-2236](https://avd.aquasec.com/nvd/cve-2024-2236)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libgcrypt20@1.9.4-3ubuntu3.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: libmount1\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libmount1@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-50495",
+          "ruleIndex": 7,
+          "level": "note",
+          "message": {
+            "text": "Package: libncurses6\nInstalled Version: 6.3-2ubuntu0.2\nVulnerability CVE-2023-50495\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libncurses6@6.3-2ubuntu0.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-50495",
+          "ruleIndex": 7,
+          "level": "note",
+          "message": {
+            "text": "Package: libncursesw6\nInstalled Version: 6.3-2ubuntu0.2\nVulnerability CVE-2023-50495\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libncursesw6@6.3-2ubuntu0.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-13757",
+          "ruleIndex": 8,
+          "level": "warning",
+          "message": {
+            "text": "Package: libp11-kit0\nInstalled Version: 0.24.0-6build1\nVulnerability CVE-2026-13757\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libp11-kit0@0.24.0-6build1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-41409",
+          "ruleIndex": 9,
+          "level": "note",
+          "message": {
+            "text": "Package: libpcre2-8-0\nInstalled Version: 10.39-3ubuntu0.1\nVulnerability CVE-2022-41409\nSeverity: LOW\nFixed Version: \nLink: [CVE-2022-41409](https://avd.aquasec.com/nvd/cve-2022-41409)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libpcre2-8-0@10.39-3ubuntu0.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2017-11164",
+          "ruleIndex": 10,
+          "level": "note",
+          "message": {
+            "text": "Package: libpcre3\nInstalled Version: 2:8.39-13ubuntu0.22.04.1\nVulnerability CVE-2017-11164\nSeverity: LOW\nFixed Version: \nLink: [CVE-2017-11164](https://avd.aquasec.com/nvd/cve-2017-11164)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libpcre3@2:8.39-13ubuntu0.22.04.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-40930",
+          "ruleIndex": 11,
+          "level": "warning",
+          "message": {
+            "text": "Package: libpng16-16\nInstalled Version: 1.6.37-3ubuntu0.5\nVulnerability CVE-2026-40930\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-40930](https://avd.aquasec.com/nvd/cve-2026-40930)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libpng16-16@1.6.37-3ubuntu0.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: libsmartcols1\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libsmartcols1@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-27943",
+          "ruleIndex": 1,
+          "level": "note",
+          "message": {
+            "text": "Package: libstdc++6\nInstalled Version: 12.3.0-1ubuntu1~22.04.3\nVulnerability CVE-2022-27943\nSeverity: LOW\nFixed Version: \nLink: [CVE-2022-27943](https://avd.aquasec.com/nvd/cve-2022-27943)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libstdc++6@12.3.0-1ubuntu1~22.04.3"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-40228",
+          "ruleIndex": 12,
+          "level": "note",
+          "message": {
+            "text": "Package: libsystemd0\nInstalled Version: 249.11-0ubuntu3.21\nVulnerability CVE-2026-40228\nSeverity: LOW\nFixed Version: \nLink: [CVE-2026-40228](https://avd.aquasec.com/nvd/cve-2026-40228)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libsystemd0@249.11-0ubuntu3.21"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-50495",
+          "ruleIndex": 7,
+          "level": "note",
+          "message": {
+            "text": "Package: libtinfo6\nInstalled Version: 6.3-2ubuntu0.2\nVulnerability CVE-2023-50495\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libtinfo6@6.3-2ubuntu0.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-40228",
+          "ruleIndex": 12,
+          "level": "note",
+          "message": {
+            "text": "Package: libudev1\nInstalled Version: 249.11-0ubuntu3.21\nVulnerability CVE-2026-40228\nSeverity: LOW\nFixed Version: \nLink: [CVE-2026-40228](https://avd.aquasec.com/nvd/cve-2026-40228)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libudev1@249.11-0ubuntu3.21"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: libuuid1\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libuuid1@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-4899",
+          "ruleIndex": 13,
+          "level": "note",
+          "message": {
+            "text": "Package: libzstd1\nInstalled Version: 1.4.8+dfsg-3build1\nVulnerability CVE-2022-4899\nSeverity: LOW\nFixed Version: \nLink: [CVE-2022-4899](https://avd.aquasec.com/nvd/cve-2022-4899)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: libzstd1@1.4.8+dfsg-3build1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-4046",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "Package: locales\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-4046\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: locales@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-5435",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Package: locales\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-5435\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: locales@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-6238",
+          "ruleIndex": 4,
+          "level": "warning",
+          "message": {
+            "text": "Package: locales\nInstalled Version: 2.35-0ubuntu3.13\nVulnerability CVE-2026-6238\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: locales@2.35-0ubuntu3.13"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-29383",
+          "ruleIndex": 14,
+          "level": "note",
+          "message": {
+            "text": "Package: login\nInstalled Version: 1:4.8.1-2ubuntu2.2\nVulnerability CVE-2023-29383\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-29383](https://avd.aquasec.com/nvd/cve-2023-29383)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: login@1:4.8.1-2ubuntu2.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2024-56433",
+          "ruleIndex": 15,
+          "level": "note",
+          "message": {
+            "text": "Package: login\nInstalled Version: 1:4.8.1-2ubuntu2.2\nVulnerability CVE-2024-56433\nSeverity: LOW\nFixed Version: \nLink: [CVE-2024-56433](https://avd.aquasec.com/nvd/cve-2024-56433)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: login@1:4.8.1-2ubuntu2.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: mount\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: mount@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-50495",
+          "ruleIndex": 7,
+          "level": "note",
+          "message": {
+            "text": "Package: ncurses-base\nInstalled Version: 6.3-2ubuntu0.2\nVulnerability CVE-2023-50495\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: ncurses-base@6.3-2ubuntu0.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-50495",
+          "ruleIndex": 7,
+          "level": "note",
+          "message": {
+            "text": "Package: ncurses-bin\nInstalled Version: 6.3-2ubuntu0.2\nVulnerability CVE-2023-50495\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-50495](https://avd.aquasec.com/nvd/cve-2023-50495)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: ncurses-bin@6.3-2ubuntu0.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-13757",
+          "ruleIndex": 8,
+          "level": "warning",
+          "message": {
+            "text": "Package: p11-kit\nInstalled Version: 0.24.0-6build1\nVulnerability CVE-2026-13757\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: p11-kit@0.24.0-6build1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-13757",
+          "ruleIndex": 8,
+          "level": "warning",
+          "message": {
+            "text": "Package: p11-kit-modules\nInstalled Version: 0.24.0-6build1\nVulnerability CVE-2026-13757\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-13757](https://avd.aquasec.com/nvd/cve-2026-13757)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: p11-kit-modules@0.24.0-6build1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2023-29383",
+          "ruleIndex": 14,
+          "level": "note",
+          "message": {
+            "text": "Package: passwd\nInstalled Version: 1:4.8.1-2ubuntu2.2\nVulnerability CVE-2023-29383\nSeverity: LOW\nFixed Version: \nLink: [CVE-2023-29383](https://avd.aquasec.com/nvd/cve-2023-29383)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: passwd@1:4.8.1-2ubuntu2.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2024-56433",
+          "ruleIndex": 15,
+          "level": "note",
+          "message": {
+            "text": "Package: passwd\nInstalled Version: 1:4.8.1-2ubuntu2.2\nVulnerability CVE-2024-56433\nSeverity: LOW\nFixed Version: \nLink: [CVE-2024-56433](https://avd.aquasec.com/nvd/cve-2024-56433)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: passwd@1:4.8.1-2ubuntu2.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-27456",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: util-linux\nInstalled Version: 2.37.2-4ubuntu3.5\nVulnerability CVE-2026-27456\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: util-linux@2.37.2-4ubuntu3.5"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2021-31879",
+          "ruleIndex": 16,
+          "level": "warning",
+          "message": {
+            "text": "Package: wget\nInstalled Version: 1.21.2-2ubuntu1.1\nVulnerability CVE-2021-31879\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2021-31879](https://avd.aquasec.com/nvd/cve-2021-31879)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: wget@1.21.2-2ubuntu1.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-58469",
+          "ruleIndex": 17,
+          "level": "warning",
+          "message": {
+            "text": "Package: wget\nInstalled Version: 1.21.2-2ubuntu1.1\nVulnerability CVE-2026-58469\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-58469](https://avd.aquasec.com/nvd/cve-2026-58469)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: wget@1.21.2-2ubuntu1.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-58470",
+          "ruleIndex": 18,
+          "level": "warning",
+          "message": {
+            "text": "Package: wget\nInstalled Version: 1.21.2-2ubuntu1.1\nVulnerability CVE-2026-58470\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-58470](https://avd.aquasec.com/nvd/cve-2026-58470)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: wget@1.21.2-2ubuntu1.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-58471",
+          "ruleIndex": 19,
+          "level": "warning",
+          "message": {
+            "text": "Package: wget\nInstalled Version: 1.21.2-2ubuntu1.1\nVulnerability CVE-2026-58471\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-58471](https://avd.aquasec.com/nvd/cve-2026-58471)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: wget@1.21.2-2ubuntu1.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-58472",
+          "ruleIndex": 20,
+          "level": "warning",
+          "message": {
+            "text": "Package: wget\nInstalled Version: 1.21.2-2ubuntu1.1\nVulnerability CVE-2026-58472\nSeverity: MEDIUM\nFixed Version: \nLink: [CVE-2026-58472](https://avd.aquasec.com/nvd/cve-2026-58472)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "library/vulnerable-spring-app",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "library/vulnerable-spring-app: wget@1.21.2-2ubuntu1.1"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-10532",
+          "ruleIndex": 21,
+          "level": "note",
+          "message": {
+            "text": "Package: ch.qos.logback:logback-core\nInstalled Version: 1.5.32\nVulnerability CVE-2026-10532\nSeverity: LOW\nFixed Version: 1.5.35\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/logback-core-1.5.32.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/logback-core-1.5.32.jar: ch.qos.logback:logback-core@1.5.32"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-9828",
+          "ruleIndex": 22,
+          "level": "note",
+          "message": {
+            "text": "Package: ch.qos.logback:logback-core\nInstalled Version: 1.5.32\nVulnerability CVE-2026-9828\nSeverity: LOW\nFixed Version: 1.5.33\nLink: [CVE-2026-9828](https://avd.aquasec.com/nvd/cve-2026-9828)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/logback-core-1.5.32.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/logback-core-1.5.32.jar: ch.qos.logback:logback-core@1.5.32"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54512",
+          "ruleIndex": 23,
+          "level": "error",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54512\nSeverity: HIGH\nFixed Version: 2.18.8, 3.1.4, 2.21.4\nLink: [CVE-2026-54512](https://avd.aquasec.com/nvd/cve-2026-54512)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54513",
+          "ruleIndex": 24,
+          "level": "error",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54513\nSeverity: HIGH\nFixed Version: 2.18.8, 2.21.4, 3.1.4\nLink: [CVE-2026-54513](https://avd.aquasec.com/nvd/cve-2026-54513)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54514",
+          "ruleIndex": 25,
+          "level": "warning",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54514\nSeverity: MEDIUM\nFixed Version: 2.18.8, 2.21.4, 3.1.4\nLink: [CVE-2026-54514](https://avd.aquasec.com/nvd/cve-2026-54514)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54515",
+          "ruleIndex": 26,
+          "level": "warning",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54515\nSeverity: MEDIUM\nFixed Version: 3.1.4, 2.18.9, 2.21.5, 2.22.1\nLink: [CVE-2026-54515](https://avd.aquasec.com/nvd/cve-2026-54515)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54516",
+          "ruleIndex": 27,
+          "level": "warning",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54516\nSeverity: MEDIUM\nFixed Version: 2.21.4, 3.1.4\nLink: [CVE-2026-54516](https://avd.aquasec.com/nvd/cve-2026-54516)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54517",
+          "ruleIndex": 28,
+          "level": "warning",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54517\nSeverity: MEDIUM\nFixed Version: 2.21.4, 3.1.4\nLink: [CVE-2026-54517](https://avd.aquasec.com/nvd/cve-2026-54517)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-54518",
+          "ruleIndex": 29,
+          "level": "warning",
+          "message": {
+            "text": "Package: com.fasterxml.jackson.core:jackson-databind\nInstalled Version: 2.21.2\nVulnerability CVE-2026-54518\nSeverity: MEDIUM\nFixed Version: 2.21.4\nLink: [CVE-2026-54518](https://avd.aquasec.com/nvd/cve-2026-54518)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar: com.fasterxml.jackson.core:jackson-databind@2.21.2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2026-47838",
+          "ruleIndex": 30,
+          "level": "warning",
+          "message": {
+            "text": "Package: org.springframework.security:spring-security-web\nInstalled Version: 6.5.10\nVulnerability CVE-2026-47838\nSeverity: MEDIUM\nFixed Version: 6.5.11\nLink: [CVE-2026-47838](https://avd.aquasec.com/nvd/cve-2026-47838)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/app.jar/BOOT-INF/lib/spring-security-web-6.5.10.jar",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "app/app.jar/BOOT-INF/lib/spring-security-web-6.5.10.jar: org.springframework.security:spring-security-web@6.5.10"
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits",
+      "properties": {
+        "imageID": "sha256:66d72849d42e525727dc3ac7bbf3ab8575312d1bcec5feb6aa9035cd1ae1cd72",
+        "imageName": "vulnerable-spring-app:ci-e4efea838ff01a63715e647737c2fa44ba5eb914",
+        "repoDigests": [],
+        "repoTags": [
+          "vulnerable-spring-app:ci-e4efea838ff01a63715e647737c2fa44ba5eb914"
+        ]
+      }
+    }
+  ]
+}

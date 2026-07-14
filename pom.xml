@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        OWASP VULNERABILITY LEARNING LAB
+        WARNING: This project contains INTENTIONAL security vulnerabilities.
+        It is for EDUCATIONAL PURPOSES ONLY in a LOCAL SANDBOX environment.
+        DO NOT deploy this to any public server.
+    -->
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.14</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.owasp.lab</groupId>
+    <artifactId>vulnerable-spring-app</artifactId>
+    <version>1.0.0</version>
+    <name>vulnerable-spring-app</name>
+    <description>OWASP Top 10 vulnerability learning lab (intentionally insecure)</description>
+
+    <properties>
+        <!-- Pinned to Java 21 per the DevSecOps pipeline spec (Spring Boot 3.3.13 BOM supports it). -->
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <jacoco.version>0.8.12</jacoco.version>
+        <!-- Default JaCoCo XML report path so SonarCloud can read coverage without extra config. -->
+        <jacoco.reportPath>${project.build.directory}/site/jacoco/jacoco.xml</jacoco.reportPath>
+        <!-- Minimum line coverage required by the pipeline (override per-run via
+             -Djacoco.min.coverage=NN). 80% matches the DevSecOps policy. -->
+        <jacoco.min.coverage>0.80</jacoco.min.coverage>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+             Override transitive tomcat-embed-core to remediate CVE-2026-41293.
+             Spring Boot 3.3.13's BOM manages a vulnerable 11.0.x; pin the
+             fixed version here so the BOM's choice is overridden.
+        -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>11.0.22</version>
+        </dependency>
+
+        <!-- Spring Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Spring Security (will be misconfigured for CSRF demo) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- H2 in-memory database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Lombok (optional) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- SonarCloud scanner — used by the security-ai-review pipeline. -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
+            </plugin>
+            <!-- JUnit 5 Surefire — produces junit.xml files the pipeline uploads. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/Test*.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+            Activated by the SonarQube CI step via `-Pcoverage`.
+
+            JaCoCo itself produces:
+              - target/site/jacoco/jacoco.xml   (consumed by Sonar)
+              - target/site/jacoco/jacoco.csv   (raw CSV)
+              - target/site/jacoco/index.html   (human view)
+
+            The pipeline's per-package coverage-summary.{csv,json,md} is
+            generated afterwards by scripts/generate-coverage-report.py
+            from jacoco.xml.
+
+            The 80% line-coverage rule is enforced via the `check` goal bound
+            to `verify`. Override with `-Djacoco.min.coverage=NN` to relax/raise
+            locally; the pipeline sets it via env -> arg in ci.yml.
+        -->
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <configuration>
+                            <!-- 80% line coverage minimum on the bundle.
+                                 Overridable from the command line. -->
+                            <jacoco.min.coverage>${jacoco.min.coverage}</jacoco.min.coverage>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.min.coverage}</minimum>
+                                        </limit>
+                                    </limits>
+                                    <excludes>
+                                        <!-- OWASP lab: model classes are data
+                                             containers exercised indirectly. -->
+                                        <exclude>com.owasp.lab.model.*</exclude>
+                                        <exclude>com.owasp.lab.VulnerableSpringAppApplication</exclude>
+                                    </excludes>
+                                </rule>
+                            </rules>
+                        </configuration>
+                        <executions>
+                            <!-- Bind the agent prepare to the `test` phase so
+                                 unit tests are instrumented (not just verify). -->
+                            <execution>
+                                <id>prepare-agent</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <!-- Generate HTML + XML + CSV reports on verify. -->
+                            <execution>
+                                <id>report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                            <!-- Enforce the coverage rule on verify. Fails the
+                                 build if line coverage < 80% (or the override). -->
+                            <execution>
+                                <id>check-coverage</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

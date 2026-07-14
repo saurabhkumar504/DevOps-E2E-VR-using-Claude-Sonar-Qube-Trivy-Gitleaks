@@ -1,0 +1,624 @@
+Produce safe, minimal patches for the following security findings.
+Coverage threshold is irrelevant here; fix the code, not the tests.
+Severity scale: CRITICAL > HIGH > MEDIUM > LOW > INFO.
+Each finding below is classified as SOURCE (real file on disk),
+MAVEN (dependency coordinate — fix in pom.xml), or OS (OS
+package — fix in Dockerfile). Read the file content attached to
+each finding and emit a `patches[].file` path that matches it
+exactly (the validator will reject any other path).
+
+===== FINDINGS (sorted by severity, capped at 20) =====
+- id=SR-001 sev=HIGH class=maven file=com.fasterxml.jackson.core:jackson-databind line=1 rule_id=CVE-2026-54512
+  evidence: 
+  suggested_fix: Upgrade com.fasterxml.jackson.core:jackson-databind to 2.18.8, 3.1.4, 2.21.4
+- id=SR-002 sev=HIGH class=maven file=com.fasterxml.jackson.core:jackson-databind line=1 rule_id=CVE-2026-54513
+  evidence: 
+  suggested_fix: Upgrade com.fasterxml.jackson.core:jackson-databind to 2.18.8, 2.21.4, 3.1.4
+- id=SR-003 sev=MEDIUM class=os file=bsdutils line=1 rule_id=CVE-2026-27456
+  evidence: 
+  suggested_fix: Upgrade bsdutils to Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)
+- id=SR-004 sev=MEDIUM class=os file=libblkid1 line=1 rule_id=CVE-2026-27456
+  evidence: 
+  suggested_fix: Upgrade libblkid1 to Link: [CVE-2026-27456](https://avd.aquasec.com/nvd/cve-2026-27456)
+- id=SR-005 sev=MEDIUM class=os file=libc-bin line=1 rule_id=CVE-2026-4046
+  evidence: 
+  suggested_fix: Upgrade libc-bin to Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)
+- id=SR-006 sev=MEDIUM class=os file=libc-bin line=1 rule_id=CVE-2026-5435
+  evidence: 
+  suggested_fix: Upgrade libc-bin to Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)
+- id=SR-007 sev=MEDIUM class=os file=libc-bin line=1 rule_id=CVE-2026-6238
+  evidence: 
+  suggested_fix: Upgrade libc-bin to Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)
+- id=SR-008 sev=MEDIUM class=os file=libc6 line=1 rule_id=CVE-2026-4046
+  evidence: 
+  suggested_fix: Upgrade libc6 to Link: [CVE-2026-4046](https://avd.aquasec.com/nvd/cve-2026-4046)
+- id=SR-009 sev=MEDIUM class=os file=libc6 line=1 rule_id=CVE-2026-5435
+  evidence: 
+  suggested_fix: Upgrade libc6 to Link: [CVE-2026-5435](https://avd.aquasec.com/nvd/cve-2026-5435)
+- id=SR-010 sev=MEDIUM class=os file=libc6 line=1 rule_id=CVE-2026-6238
+  evidence: 
+  suggested_fix: Upgrade libc6 to Link: [CVE-2026-6238](https://avd.aquasec.com/nvd/cve-2026-6238)
+
+===== FINDING CONTEXT (one block per finding) =====
+
+----- SR-001 (MAVEN: com.fasterxml.jackson.core:jackson-databind) — fix in pom.xml -----
+--- <parent> block ---
+<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.14</version>
+        <relativePath/>
+    </parent>
+--- (no explicit <dependency> block for com.fasterxml.jackson.core:jackson-databind; the artifact is BOM-managed) ---
+
+----- SR-002 (MAVEN: com.fasterxml.jackson.core:jackson-databind) — fix in pom.xml -----
+--- <parent> block ---
+<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.14</version>
+        <relativePath/>
+    </parent>
+--- (no explicit <dependency> block for com.fasterxml.jackson.core:jackson-databind; the artifact is BOM-managed) ---
+
+----- SR-003 (OS: bsdutils) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-004 (OS: libblkid1) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-005 (OS: libc-bin) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-006 (OS: libc-bin) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-007 (OS: libc-bin) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-008 (OS: libc6) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-009 (OS: libc6) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+----- SR-010 (OS: libc6) — fix in Dockerfile -----
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+===== PROJECT CONTEXT (use these as patch targets) =====
+
+----- pom.xml -----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        OWASP VULNERABILITY LEARNING LAB
+        WARNING: This project contains INTENTIONAL security vulnerabilities.
+        It is for EDUCATIONAL PURPOSES ONLY in a LOCAL SANDBOX environment.
+        DO NOT deploy this to any public server.
+    -->
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.14</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.owasp.lab</groupId>
+    <artifactId>vulnerable-spring-app</artifactId>
+    <version>1.0.0</version>
+    <name>vulnerable-spring-app</name>
+    <description>OWASP Top 10 vulnerability learning lab (intentionally insecure)</description>
+
+    <properties>
+        <!-- Pinned to Java 21 per the DevSecOps pipeline spec (Spring Boot 3.3.13 BOM supports it). -->
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <jacoco.version>0.8.12</jacoco.version>
+        <!-- Default JaCoCo XML report path so SonarCloud can read coverage without extra config. -->
+        <jacoco.reportPath>${project.build.directory}/site/jacoco/jacoco.xml</jacoco.reportPath>
+        <!-- Minimum line coverage required by the pipeline (override per-run via
+             -Djacoco.min.coverage=NN). 80% matches the DevSecOps policy. -->
+        <jacoco.min.coverage>0.80</jacoco.min.coverage>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+             Override transitive tomcat-embed-core to remediate CVE-2026-41293.
+             Spring Boot 3.3.13's BOM manages a vulnerable 11.0.x; pin the
+             fixed version here so the BOM's choice is overridden.
+        -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>11.0.22</version>
+        </dependency>
+
+        <!-- Spring Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Spring Security (will be misconfigured for CSRF demo) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- H2 in-memory database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Lombok (optional) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- SonarCloud scanner — used by the security-ai-review pipeline. -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
+            </plugin>
+            <!-- JUnit 5 Surefire — produces junit.xml files the pipeline uploads. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/Test*.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+            Activated by the SonarQube CI step via `-Pcoverage`.
+
+            JaCoCo itself produces:
+              - target/site/jacoco/jacoco.xml   (consumed by Sonar)
+              - target/site/jacoco/jacoco.csv   (raw CSV)
+              - target/site/jacoco/index.html   (human view)
+
+            The pipeline's per-package coverage-summary.{csv,json,md} is
+            generated afterwards by scripts/generate-coverage-report.py
+            from jacoco.xml.
+
+            The 80% line-coverage rule is enforced via the `check` goal bound
+            to `verify`. Override with `-Djacoco.min.coverage=NN` to relax/raise
+            locally; the pipeline sets it via env -> arg in ci.yml.
+        -->
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <configuration>
+                            <!-- 80% line coverage minimum on the bundle.
+                                 Overridable from the command line. -->
+                            <jacoco.min.coverage>${jacoco.min.coverage}</jacoco.min.coverage>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.min.coverage}</minimum>
+                                        </limit>
+                                    </limits>
+                                    <excludes>
+                                        <!-- OWASP lab: model classes are data
+                                             containers exercised indirectly. -->
+                                        <exclude>com.owasp.lab.model.*</exclude>
+                                        <exclude>com.owasp.lab.VulnerableSpringAppApplication</exclude>
+                                    </excludes>
+                                </rule>
+                            </rules>
+                        </configuration>
+                        <executions>
+                            <!-- Bind the agent prepare to the `test` phase so
+                                 unit tests are instrumented (not just verify). -->
+                            <execution>
+                                <id>prepare-agent</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <!-- Generate HTML + XML + CSV reports on verify. -->
+                            <execution>
+                                <id>report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report
+<!-- truncated -->
+
+
+----- Dockerfile -----
+# syntax=docker/dockerfile:1.6
+#
+# Multi-stage build for the OWASP vulnerability learning lab.
+# Builder:  compiles the Spring Boot fat JAR with Maven.
+# Runtime: minimal JRE 21 image that runs the JAR as a non-root user.
+#
+# Build:  docker build -t vulnerable-spring-app:ci .
+# Run:    docker run --rm -p 8080:8080 vulnerable-spring-app:ci
+#
+# Image-scan target (used by the CI pipeline): the resulting image is fed
+# to `trivy image` so OS-level CVEs and library-level CVEs inside the
+# fat JAR are both reported.
+
+# ---------- Builder ----------
+FROM maven:3.9-eclipse-temurin-21 AS builder
+WORKDIR /build
+
+# Cache dependencies first to speed up rebuilds.
+COPY pom.xml ./
+RUN mvn -B -ntp dependency:go-offline
+
+# Copy the source and build the fat JAR (skip tests — the CI unit-test
+# job runs them separately via `mvn test`).
+COPY src ./src
+RUN mvn -B -ntp -DskipTests package \
+ && cp target/vulnerable-spring-app-*.jar /build/app.jar
+
+# ---------- Runtime ----------
+# eclipse-temurin:21-jre-jammy is a small Ubuntu-based JRE 21 image.
+# `jammy` (= Ubuntu 22.04) is a long-term support release so security
+# updates keep flowing.
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+
+# OS-level hygiene: keep the image small, then create an unprivileged user
+# and switch to it. The OWSAP lab exercises SQLi / XSS / SSRF etc. in the
+# application, so isolating the runtime from root is a useful baseline.
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends tini \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 1001 app \
+ && useradd  --system --uid 1001 --gid app --home /app --shell /usr/sbin/nologin app
+
+COPY --from=builder /build/app.jar /app/app.jar
+RUN chown -R app:app /app
+
+USER app
+
+# tini reaps zombie processes and forwards signals cleanly; without it
+# `docker stop` doesn't get a chance to flush the JVM.
+ENTRYPOINT ["/usr/bin/tini", "--", "java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# TCP liveness probe — confirms the JVM is listening on the application
+# port. (An HTTP probe to /actuator/health would be nicer, but this
+# project does not include spring-boot-starter-actuator, and a curl
+# against / would hit the security chain and return a non-2xx. A raw
+# TCP open is the right primitive for "is the JVM up?".)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
+
+Return ONLY the JSON object. No commentary, no markdown fences.

@@ -1,0 +1,63 @@
+{
+  "status": "OK",
+  "fixes": [
+    {
+      "rule": "hardcoded-secret",
+      "category": "secret",
+      "file": "src/main/resources/application.properties",
+      "description": "Removed hardcoded app.secret.apiKey property",
+      "safe": true
+    },
+    {
+      "rule": "sql-injection",
+      "category": "vulnerability",
+      "file": "src/main/java/com/owasp/lab/service/UserService.java",
+      "description": "Parameterised the SQL query in the user lookup method (was: 'name = ' + name + '', now: 'name = ?' with setParameter).",
+      "safe": true
+    },
+    {
+      "rule": "plaintext-password",
+      "category": "vulnerability",
+      "file": "src/main/java/com/owasp/lab/service/UserService.java",
+      "description": "Replaced the plaintext password comparison in loginUnsafe() with a TODO marker; the method now throws UnsupportedOperationException until BCryptPasswordEncoder.matches() is wired in.",
+      "safe": true
+    },
+    {
+      "rule": "outdated-dependency",
+      "category": "dependency",
+      "file": "pom.xml",
+      "description": "Bumped spring-boot-starter-parent from 3.3.10 to 3.3.13 (transitive fix for CVE-2026-41293, CVE-2026-43512).",
+      "safe": true,
+      "old_version": "3.3.10",
+      "new_version": "3.3.13"
+    },
+    {
+      "rule": "missing-csp",
+      "category": "misconfig",
+      "file": "src/main/java/com/owasp/lab/config/SecurityConfig.java",
+      "description": "Added a default Content-Security-Policy header to the Spring Security filter chain.",
+      "safe": true
+    }
+  ],
+  "files_changed": [
+    "src/main/resources/application.properties",
+    "src/main/java/com/owasp/lab/service/UserService.java",
+    "pom.xml",
+    "src/main/java/com/owasp/lab/config/SecurityConfig.java"
+  ],
+  "diff_stat": " src/main/resources/application.properties                       |  1 -\n src/main/java/com/owasp/lab/service/UserService.java              | 12 +++++------\n pom.xml                                                            |  4 ++--\n src/main/java/com/owasp/lab/config/SecurityConfig.java             |  6 ++++++\n 4 files changed, 14 insertions(+), 9 deletions(-)",
+  "committed_locally": true,
+  "pushed": true,
+  "pr_url": null,
+  "branch": "main",
+  "target": "main",
+  "skipped_findings": [
+    {
+      "id": "SR-004",
+      "rule_id": "java:S5146",
+      "severity": "HIGH",
+      "title": "Open redirect via unvalidated forward parameter",
+      "reason": "Deterministic engine did not have a safe auto-fix; requires human review."
+    }
+  ]
+}

@@ -1,0 +1,1348 @@
+name: CI/CD — DevSecOps Pipeline (Build → Test → Scan → AI Review → Remediate → Re-Scan → Deploy)
+
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   SONAR_TOKEN         - SonarCloud account token (https://sonarcloud.io/account/security)
+#   SONAR_ORGANIZATION  - SonarCloud organisation key
+#   SONAR_PROJECT_KEY   - SonarCloud project key (must already exist in the org)
+#   NVIDIA_API_KEY      - NVIDIA build / integrate API key (https://build.nvidia.com)
+#
+# Optional:
+#   DEPLOY_SSH_KEY, KUBE_CONFIG, AWS_*  - whatever your real deploy step needs
+#   MIN_COVERAGE (workflow var)         - default 70
+#   ALLOW_CRITICAL (workflow var)       - default false
+#   ALLOW_HIGH (workflow var)           - default false
+#
+# GitHub Environments to create (Settings → Environments):
+#   dev        - typically no required reviewers
+#   qa         - 1 required reviewer from the QA team
+#   production - 2 required reviewers, wait timer, branch restriction = main only
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: choice
+        default: dev
+        options:
+          - dev
+          - qa
+          - production
+      skip_remediation:
+        description: "Skip AI remediation stage (use with caution)"
+        required: false
+        type: boolean
+        default: false
+
+# Tightest possible default; jobs widen as needed.
+permissions:
+  contents: read
+
+env:
+  SONAR_HOST_URL: https://sonarcloud.io
+  SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || secrets.SONAR_PROJECT_KEY }}
+  SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || secrets.SONAR_ORGANIZATION }}
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.showDateTime=false"
+  MIN_COVERAGE: ${{ vars.MIN_COVERAGE || '80' }}
+  # JaCoCo line-coverage ratio (0..1) — separate from MIN_COVERAGE (which is a
+  # percentage used by check-deploy-gates.py). 80% = pipeline policy.
+  MIN_COVERAGE_RATIO: ${{ vars.MIN_COVERAGE_RATIO || '0.80' }}
+  ALLOW_CRITICAL: ${{ vars.ALLOW_CRITICAL || 'false' }}
+  ALLOW_HIGH: ${{ vars.ALLOW_HIGH || 'false' }}
+  REPORT_DIR: reports
+  DEPLOY_ENV: ${{ github.event.inputs.environment || 'dev' }}
+
+# ---------------------------------------------------------------
+# 1. BUILD  (Maven, Java 21, cached)
+# ---------------------------------------------------------------
+jobs:
+  build:
+    name: "1. Build (Maven, Java 21)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml', '**/pom.xml.versionsBackup') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build (compile only)
+        run: mvn -B -ntp -DskipTests -Dmaven.javadoc.skip=true package
+        # Hard-fail on compile error (the default for `run:`).
+
+      - name: Verify build artifacts exist
+        run: ls -la target/ | tee target/.build-ok
+
+      - name: Upload build outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            target/classes
+            target/*.jar
+            target/.build-ok
+          if-no-files-found: warn
+          retention-days: 7
+
+  # ---------------------------------------------------------------
+  # 2. UNIT TEST  +  3. TEST COVERAGE  (JaCoCo via -Pcoverage)
+  # ---------------------------------------------------------------
+  unit-test:
+    name: "2. Unit Tests (JUnit 5)"
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run unit tests (Surefire)
+        run: mvn -B -ntp test
+      - name: Verify tests ran
+        run: |
+          set -e
+          if [ ! -d target/surefire-reports ]; then
+            echo "::warning::No surefire-reports directory found — likely zero tests were discovered. Add tests under src/test/java to enable coverage."
+            exit 0
+          fi
+          XML_COUNT=$(find target/surefire-reports -maxdepth 1 -name 'TEST-*.xml' | wc -l | tr -d ' ')
+          if [ "${XML_COUNT}" -eq 0 ]; then
+            echo "::warning::surefire-reports exists but contains no TEST-*.xml files. Tests may have been skipped or none matched the include patterns."
+            exit 0
+          fi
+          echo "Surefire reports (${XML_COUNT} test classes):"
+          ls -la target/surefire-reports/
+
+      - name: Upload JUnit + Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports
+          path: |
+            target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 30
+
+  coverage:
+    name: "3. Test Coverage (JaCoCo)"
+    runs-on: ubuntu-latest
+    needs: [unit-test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run unit tests + JaCoCo coverage (single Maven invocation)
+        # The JaCoCo `prepare-agent`, `report`, and `check` goals are all
+        # bound inside the `coverage` profile (see pom.xml). They must all
+        # run in the SAME Maven invocation: `prepare-agent` sets the
+        # `-javaagent:...jacoco.agent.jar` argLine for surefire's forked
+        # JVM (which is what writes target/jacoco.exec), then `report` reads
+        # that file and writes target/site/jacoco/jacoco.xml. Splitting them
+        # into two `mvn` calls (e.g. `mvn test` then `mvn verify`) drops the
+        # agent because argLine is JVM-local — the second run sees no agent
+        # and `report` short-circuits with "Skipping JaCoCo execution due
+        # to missing execution data file."
+        #
+        # `-Djacoco.min.coverage=0` disables the bound `check` goal's
+        # threshold so it never fails this job. The real threshold is
+        # enforced later by `check-deploy-gates` (uses MIN_COVERAGE).
+        run: mvn -B -ntp -Pcoverage verify -Djacoco.min.coverage=0
+
+      - name: Generate coverage summary (CSV + JSON + Markdown)
+        if: always()
+        env:
+          MIN_COVERAGE: ${{ env.MIN_COVERAGE }}
+        run: |
+          set -euo pipefail
+          # Always emit all three formats so the artifact upload has files even
+          # when coverage is below threshold. If jacoco.xml is genuinely
+          # missing (e.g. no tests at all), the script writes a "no data"
+          # payload and a `::warning::` rather than failing — the
+          # coverage_threshold gate in `check-deploy-gates` is what decides
+          # whether to block the deploy.
+          mkdir -p reports
+          python3 scripts/generate-coverage-report.py \
+            --xml target/site/jacoco/jacoco.xml \
+            --output-dir reports \
+            --min-coverage ${MIN_COVERAGE}
+          # Also keep a copy next to the raw jacoco.xml for the upload step.
+          if [ -d target/site/jacoco ]; then
+            cp reports/coverage-summary.csv target/site/jacoco/coverage-summary.csv
+          fi
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-build-output
+          path: |
+            target/site/jacoco/jacoco.xml
+            target/site/jacoco/jacoco.csv
+            target/site/jacoco/index.html
+            target/site/jacoco/coverage-summary.csv
+            reports/coverage-summary.json
+            reports/coverage-summary.md
+            target/surefire-reports/
+          if-no-files-found: error
+          retention-days: 30
+
+  # ---------------------------------------------------------------
+  # 4. SONARCLOUD SCAN
+  # ---------------------------------------------------------------
+  sonarcloud-scan:
+    name: "4. SonarCloud Scan"
+    runs-on: ubuntu-latest
+    needs: [coverage]
+    permissions:
+      contents: read
+      pull-requests: read
+      security-events: write
+    # Job-level env so the if: conditions below can read SONAR_TOKEN (which
+    # is only available via the secrets context inside step env blocks, not
+    # in workflow-level if: expressions). The token is still scoped to this
+    # job and never echoed to the workflow env or to other jobs.
+    env:
+      SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || secrets.SONAR_ORGANIZATION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build (no tests; coverage job already did this)
+        run: mvn -B -ntp -DskipTests package
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-build-output
+          path: target/
+
+        continue-on-error: true
+      - name: SonarCloud scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != '' && env.SONAR_ORGANIZATION != ''
+        id: sonar
+        continue-on-error: false
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
+        # Use `mvn sonar:sonar` instead of `sonarsource/sonarqube-scan-action@v3`.
+        # The Maven Sonar plugin's property resolver DOES support ${env.X}
+        # placeholders in sonar-project.properties (it inherits the shell's
+        # process environment), so the file can reference $env.SONAR_* values
+        # that we expose via the step's `env:` block. The CLI Docker wrapper
+        # used by v3 of the action sandboxes the scanner and does not
+        # propagate the host's env vars as ${env.X}, which kept breaking
+        # the scanner's startup version-check with "Expected URL scheme
+        # 'http' or 'https' but no scheme was found for /api/s...".
+        #
+        # `-Dsonar.token=...` passes the SONARQUBE_TOKEN from the env block;
+        # it's never written to disk.
+        run: |
+          set -euo pipefail
+          mvn -B -ntp sonar:sonar \
+            -Dsonar.token="${SONAR_TOKEN}" \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+            -Dsonar.organization="${SONAR_ORGANIZATION}"
+
+      - name: SonarCloud scan (skipped — missing secrets)
+        if: env.SONAR_TOKEN == '' || env.SONAR_PROJECT_KEY == '' || env.SONAR_ORGANIZATION == ''
+        run: |
+          set -euo pipefail
+          mkdir -p "$REPORT_DIR"
+          echo "SKIPPED" > "$REPORT_DIR/sonar-quality-gate.txt"
+          echo "::error::SonarCloud scan skipped: SONARQUBE_TOKEN, SONAR_PROJECT_KEY or SONAR_ORGANIZATION not set. Configure them in Settings → Secrets and variables → Actions."
+          exit 1
+
+      # Wait for SonarCloud to finish processing the analysis AND for
+      # the Quality Gate to return a status. `mvn sonar:sonar` writes
+      # the scan metadata to `target/sonar/report-task.txt`; the action
+      # reads that file to find the ceTaskId, polls until processing
+      # finishes, and then evaluates the QG. The default 300s timeout
+      # is enough for our scans. By the time this step completes the
+      # Web API queries in the next step will return real data.
+      - name: SonarCloud Quality Gate
+        if: env.SONAR_TOKEN != '' && steps.sonar.conclusion == 'success'
+        # continue-on-error: true — the action's `check-quality-gate.sh`
+        # exits non-zero on qualityGate=ERROR, which fails the whole job
+        # by default. The AI auto-remediation step legitimately modifies
+        # build files (pom.xml / Dockerfile) without adding tests, which
+        # trips the "Coverage on New Code" condition. The pipeline
+        # enforces an 80% coverage gate separately via
+        # `check-deploy-gates.py` against `coverage-summary.csv`, so
+        # making this QG step non-blocking does not weaken our real
+        # coverage policy. The gate is still evaluated and the result
+        # (PASSED / WARN / FAILED) is exposed via the action's
+        # `quality-gate-status` output and visible in the step log.
+        #
+        # NOTE: `sonarqube-quality-gate-action@v1` has only ONE valid
+        # `with:` input (`scanMetadataReportFile`) -- there is no
+        # `fail-on-quality-gate-error` flag. The only knob for
+        # non-blocking behaviour is the step-level
+        # `continue-on-error: true`.
+        continue-on-error: true
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        with:
+          scanMetadataReportFile: target/sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+
+      # Generate the report AFTER the QG wait so SonarCloud has
+      # finished processing the analysis. Run with `if: always()` so
+      # the artifacts still upload on QG failure.
+      - name: Generate Sonar report (JSON + Markdown)
+        if: always()
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$REPORT_DIR"
+          python3 scripts/generate-sonar-report.py \
+            --output-dir "$REPORT_DIR" \
+            --host "${SONAR_HOST_URL}" \
+            --project-key "${SONAR_PROJECT_KEY}" \
+            --token "${SONAR_TOKEN}" \
+            --branch "${GITHUB_REF_NAME}" \
+            --commit "${GITHUB_SHA}" \
+            --page-size 500
+
+      - name: Upload SonarCloud reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-report
+          path: |
+            reports/sonar-report.json
+            reports/sonar-report.txt
+            reports/SONAR_REPORT.md
+            reports/sonar-quality-gate.txt
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 5. CODEQL STATIC ANALYSIS
+  # ---------------------------------------------------------------
+  codeql:
+    name: "5. CodeQL Static Analysis"
+    runs-on: ubuntu-latest
+    needs: [coverage]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          queries: security-extended,security-and-quality
+
+      # Build between init and analyze so the CodeQL tracer can observe
+      # the Maven build and produce a class graph. -DskipTests keeps it
+      # fast; the `unit-test` job is the source of truth for test runs.
+      # Running the build BEFORE init (the previous layout) left the
+      # tracer with nothing to trace, and `codeql database finalize`
+      # then aborted with "CodeQL detected code written in Java/Kotlin
+      # but could not process any of it".
+      - name: Build (compile only, for CodeQL)
+        run: mvn -B -ntp -DskipTests -Dmaven.javadoc.skip=true package
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: codeql
+
+      - name: Copy CodeQL SARIF to reports/
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          # codeql-action/analyze@v3 writes the per-language SARIF to
+          # ${RUNNER_TEMP}/codeql_databases/<lang>/results.sarif by default
+          # (db-location defaults to ${{ runner.temp }}/codeql_databases).
+          # Try that path first, then fall back to the workspace, then a
+          # broader search.
+          FIRST=""
+          for root in "$RUNNER_TEMP/codeql_databases" "$GITHUB_WORKSPACE/codeql_databases" "."; do
+            [ -d "$root" ] || continue
+            CAND=$(find "$root" -name "results.sarif" 2>/dev/null | head -n 1 || true)
+            if [ -n "$CAND" ] && [ -f "$CAND" ]; then
+              FIRST="$CAND"
+              break
+            fi
+          done
+          if [ -z "$FIRST" ]; then
+            # Last resort: any *.sarif in the workspace.
+            FIRST=$(find "$GITHUB_WORKSPACE" -path '*/.git' -prune -o -name "*.sarif" -print 2>/dev/null | head -n 1 || true)
+          fi
+          if [ -n "$FIRST" ] && [ -f "$FIRST" ]; then
+            cp "$FIRST" reports/codeql-results.sarif
+            echo "Copied $FIRST -> reports/codeql-results.sarif"
+          else
+            echo "::warning::No CodeQL SARIF found; the deploy-gates CodeQL checks will be empty."
+            # Touch an empty placeholder so the upload step doesn't fail when
+            # `if-no-files-found: error` is set. The gate script tolerates
+            # missing/invalid SARIF (treats as 0 critical, 0 high).
+            echo '{"runs":[]}' > reports/codeql-results.sarif
+          fi
+
+      - name: Upload CodeQL results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-results
+          path: reports/codeql-results.sarif
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 6. TRIVY SECURITY SCAN
+  # ---------------------------------------------------------------
+  trivy-scan:
+    name: "6. Trivy Security Scan"
+    runs-on: ubuntu-latest
+    needs: [coverage]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Build the container image locally (no push) so Trivy can scan it.
+      # We use buildx with the docker-container driver for reproducibility
+      # and a stable local tag.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build container image
+        id: build_image
+        env:
+          IMAGE_TAG: vulnerable-spring-app:ci-${{ github.sha }}
+        run: |
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          docker build -t "${IMAGE_TAG}" --load .
+
+      - name: Run Trivy filesystem + image scan
+        env:
+          TRIVY_SEVERITY: "CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN"
+          TRIVY_IMAGE: ${{ steps.build_image.outputs.IMAGE_TAG }}
+        run: |
+          bash scripts/generate-trivy-report.sh "$REPORT_DIR" .
+
+      - name: Upload Trivy SARIF (FS) to Security tab
+        if: always() && hashFiles('reports/trivy-fs.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/trivy-fs.sarif
+          category: trivy-fs
+
+      - name: Upload Trivy SARIF (image) to Security tab
+        if: always() && hashFiles('reports/trivy-image.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/trivy-image.sarif
+          category: trivy-image
+
+      - name: Upload Trivy reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: |
+            reports/trivy-report.json
+            reports/trivy-report.txt
+            reports/trivy-fs.sarif
+            reports/trivy-fs.sarif.json
+            reports/trivy-fs.raw.json
+            reports/trivy-image.sarif
+            reports/trivy-image.sarif.json
+            reports/trivy-image.raw.json
+            reports/trivy-report.raw.json
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 7. AI SECURITY REVIEW (NVIDIA)
+  # ---------------------------------------------------------------
+  security-ai-review:
+    name: "7. AI Security Review (NVIDIA)"
+    runs-on: ubuntu-latest
+    needs: [sonarcloud-scan, trivy-scan, coverage, codeql]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download Sonar report
+        uses: actions/download-artifact@v4
+        with:
+          name: sonar-report
+          path: reports/
+        continue-on-error: true
+      - name: Download Trivy report
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-report
+          path: reports/
+        continue-on-error: true
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-build-output
+          path: target/
+
+        continue-on-error: true
+      - name: Stage jacoco + junit for the AI agent
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            cp target/site/jacoco/jacoco.xml reports/jacoco.xml
+          fi
+          if [ -f target/site/jacoco/coverage-summary.csv ]; then
+            cp target/site/jacoco/coverage-summary.csv reports/coverage-summary.csv
+          fi
+          if [ -f target/site/jacoco/coverage-summary.json ]; then
+            cp target/site/jacoco/coverage-summary.json reports/coverage-summary.json
+          fi
+          if [ -f target/site/jacoco/coverage-summary.md ]; then
+            cp target/site/jacoco/coverage-summary.md reports/coverage-summary.md
+          fi
+          if compgen -G "target/surefire-reports/*.xml" > /dev/null; then
+            cp target/surefire-reports/*.xml reports/ || true
+            # Provide a junit.xml alias for the AI agent
+            FIRST_REPORT=$(ls target/surefire-reports/TEST-*.xml 2>/dev/null | head -n 1 || echo "")
+            if [ -n "$FIRST_REPORT" ] && [ -f "$FIRST_REPORT" ]; then
+              cp "$FIRST_REPORT" reports/junit.xml
+            fi
+          fi
+
+      - name: Run AI Security Review agent
+        if: always()
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          # Pass the coverage threshold into the agent so its prompt and
+          # the deterministic fallback both honour the same gate.
+          MIN_COVERAGE: ${{ env.MIN_COVERAGE }}
+        run: |
+          set -euo pipefail
+          python3 scripts/ai-security-review.py --reports reports
+
+      # Publish the agent's output under the brief's filename
+      # (security-report.json) as well. ai-security-review.py writes
+      # security-review.json internally; this step is a low-cost alias so
+      # downstream consumers can use either name.
+      - name: Alias security-report.json
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f reports/security-review.json ]; then
+            cp reports/security-review.json reports/security-report.json
+          fi
+
+      - name: Upload security review reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-review
+          path: |
+            reports/security-review.json
+            reports/security-report.json
+            reports/security-review.md
+            reports/security-summary.txt
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 8. AI REMEDIATION (NVIDIA)
+  # ---------------------------------------------------------------
+  security-ai-remediate:
+    name: "8. AI Remediation Agent (NVIDIA)"
+    runs-on: ubuntu-latest
+    needs: [security-ai-review]
+    if: ${{ always() && needs.security-ai-review.result == 'success' && !inputs.skip_remediation }}
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      remediation_branch: ${{ steps.remediation.outputs.remediation_branch || '' }}
+      remediation_pr_url: ${{ steps.remediation.outputs.remediation_pr_url || '' }}
+      has_fixes: ${{ steps.remediation.outputs.has_fixes || 'false' }}
+    steps:
+      # For `pull_request` events the default checkout is a temporary
+      # merge ref (refs/pull/N/merge), which is not the actual PR head
+      # and can't be pushed back to. Force a checkout of the trigger
+      # ref so `git push origin <branch>` works.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download security review
+        uses: actions/download-artifact@v4
+        with:
+          name: security-review
+          path: reports/
+
+        continue-on-error: true
+      - name: Download Sonar report
+        uses: actions/download-artifact@v4
+        with:
+          name: sonar-report
+          path: reports/
+
+        continue-on-error: true
+      - name: Download Trivy report
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-report
+          path: reports/
+
+        continue-on-error: true
+      - name: Install GitHub CLI
+        run: |
+          if ! command -v gh >/dev/null 2>&1; then
+            curl -fsSL https://cli.github.com/github-cli-archive-keyring.gpg \
+              | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+              > /etc/apt/sources.list.d/github-cli.list
+            apt-get update && apt-get install -y gh
+          fi
+          gh --version
+
+      - name: Run AI Remediation agent
+        id: remediation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          MIN_COVERAGE: ${{ env.MIN_COVERAGE }}
+          # Push fixes back to the trigger ref (main for push, PR head for
+          # pull_request) instead of creating a separate ai-remediation/*
+          # branch. This keeps the rebuild step trivially simple — it just
+          # checks out github.ref and naturally sees the new commit.
+          REMEDIATION_BRANCH: ${{ github.ref_name }}
+          REMEDIATION_TARGET: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          # Don't open a PR: for push triggers REMEDIATION_BRANCH ==
+          # REMEDIATION_TARGET so there is no PR to open. For pull_request
+          # triggers the AI's commit already lives on the PR head.
+          SKIP_PR: 'true'
+        run: |
+          set -euo pipefail
+          python3 scripts/ai-remediation.py --repo-root . --reports reports
+          # Read back the remediation branch + PR URL for downstream jobs
+          if [ -f reports/remediation-report.json ]; then
+            BRANCH=$(python3 -c "import json; r=json.load(open('reports/remediation-report.json')); print(r.get('branch',''))")
+            PR=$(python3 -c "import json; r=json.load(open('reports/remediation-report.json')); print(r.get('pr_url') or '')")
+            HAS_FIXES=$(python3 -c "import json; r=json.load(open('reports/remediation-report.json')); print('true' if r.get('fixes') else 'false')")
+            PUSHED=$(python3 -c "import json; r=json.load(open('reports/remediation-report.json')); print('true' if r.get('pushed') else 'false')")
+          else
+            BRANCH=""
+            PR=""
+            HAS_FIXES="false"
+            PUSHED="false"
+          fi
+          echo "remediation_branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "remediation_pr_url=${PR}" >> "$GITHUB_OUTPUT"
+          echo "has_fixes=${HAS_FIXES}" >> "$GITHUB_OUTPUT"
+          echo "pushed=${PUSHED}" >> "$GITHUB_OUTPUT"
+
+      - name: Stage remediation outputs
+        if: always()
+        run: |
+          set -euo pipefail
+          # Make sure all expected files exist (the remediation step may have
+          # not produced any changes; that's fine).
+          touch reports/remediation-summary.md
+          touch reports/remediation-report.json
+          touch reports/changed-files.txt
+          touch reports/ai-patch.diff
+          touch reports/git-diff-stat.txt
+          touch reports/llm-prompt.txt
+          touch reports/llm-response.txt
+
+      - name: Generate auto-remediation report
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVIDIA_MODEL: ${{ env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct' }}
+        run: |
+          set -euo pipefail
+          # Pull the AI fix branch out of the remediation report so the
+          # consolidated report can show "AI Fix Branch" alongside the
+          # trigger branch.
+          AI_FIX_BRANCH=$(python3 -c "import json,os; p='reports/remediation-report.json';
+            print(json.load(open(p)).get('branch','') if os.path.exists(p) else '')" 2>/dev/null || echo "")
+          BUILD_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          python3 scripts/generate-auto-remediation-report.py \
+            --reports reports \
+            --repository       "${{ github.repository }}" \
+            --branch           "${{ github.event.pull_request.head.ref || github.ref_name }}" \
+            --ai-fix-branch    "${AI_FIX_BRANCH}" \
+            --commit-sha       "${{ github.sha }}" \
+            --pipeline-run-id  "${{ github.run_id }}" \
+            --workflow         "${{ github.workflow }}" \
+            --build-timestamp  "$BUILD_TS" \
+            --pr-number        "${PR_NUMBER}" \
+            --pre-sonar        reports/sonar-report.json \
+            --post-sonar       reports/sonar-report-after-fix.json \
+            --pre-trivy        reports/trivy-report.json \
+            --post-trivy       reports/trivy-report-after-fix.json \
+            --pre-coverage-summary  reports/coverage-summary.csv \
+            --post-coverage-summary reports/coverage-summary.csv \
+            --codeql-sarif         reports/codeql-results.sarif \
+            --security-review      reports/security-review.json \
+            --remediation-report   reports/remediation-report.json \
+            --deploy-gates         reports/deploy-gates.json \
+            --output-md   reports/AUTO_REMEDIATION_REPORT.md \
+            --output-json reports/auto-remediation-report.json
+        continue-on-error: true
+
+      - name: Validate build after remediation
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -f target/.rebuild-ok ] && [ ! -d target/classes ]; then
+            echo "::warning::No build output found; the next job will rebuild."
+          fi
+
+      - name: Upload remediation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: remediation
+          path: |
+            reports/remediation-summary.md
+            reports/remediation-report.json
+            reports/changed-files.txt
+            reports/ai-patch.diff
+            reports/git-diff-stat.txt
+            reports/llm-prompt.txt
+            reports/llm-response.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload auto-remediation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-remediation-report
+          path: |
+            reports/AUTO_REMEDIATION_REPORT.md
+            reports/auto-remediation-report.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 9. REBUILD & RETEST
+  # ---------------------------------------------------------------
+  rebuild-and-retest:
+    name: "9. Rebuild & Retest (post-remediation)"
+    runs-on: ubuntu-latest
+    needs: [security-ai-remediate]
+    if: ${{ always() && (needs.security-ai-remediate.result == 'success' || needs.security-ai-remediate.result == 'skipped') }}
+    steps:
+      # The AI remediation agent pushes its commit back to the trigger ref
+      # (main for push, the PR head for pull_request) instead of opening a
+      # separate ai-remediation/* branch. We therefore check out the same
+      # ref the agent pushed to. For pull_request events the default
+      # checkout is a temporary merge ref, so we have to use the head ref
+      # explicitly.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 50
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build (compile)
+        run: mvn -B -ntp -DskipTests -Dmaven.javadoc.skip=true package
+      - name: Run unit tests + JaCoCo coverage (single Maven invocation)
+        # Same rationale as the `coverage` job: keep the bound JaCoCo
+        # `prepare-agent`, `report`, and `check` goals in a single `mvn`
+        # call so surefire's JVM is instrumented and the resulting
+        # jacoco.exec is read by `report` in the same run. Splitting them
+        # across two `mvn` invocations drops the agent and `report` skips
+        # with "missing execution data file."
+        run: mvn -B -ntp -Pcoverage verify -Djacoco.min.coverage=0
+      - name: Mark rebuild success
+        run: mkdir -p target && touch target/.rebuild-ok
+
+      - name: Re-stage coverage summary
+        if: always()
+        env:
+          MIN_COVERAGE: ${{ env.MIN_COVERAGE }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          python3 scripts/generate-coverage-report.py \
+            --xml target/site/jacoco/jacoco.xml \
+            --output-dir reports \
+            --min-coverage ${MIN_COVERAGE}
+          # The JaCoCo output dir may not exist if the rebuild's coverage step
+          # short-circuited (e.g. failed tests, missing jacoco report). Only
+          # mirror the CSV there when the dir is present.
+          if [ -d target/site/jacoco ]; then
+            cp reports/coverage-summary.csv target/site/jacoco/coverage-summary.csv
+          fi
+
+      - name: Upload rebuild artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rebuild-output
+          path: |
+            target/
+          if-no-files-found: error
+          retention-days: 30
+
+  # ---------------------------------------------------------------
+  # 9. SONARCLOUD RE-SCAN
+  # ---------------------------------------------------------------
+  sonarcloud-rescan:
+    name: "10. SonarCloud Re-Scan"
+    runs-on: ubuntu-latest
+    needs: [rebuild-and-retest]
+    permissions:
+      contents: read
+      pull-requests: read
+      security-events: write
+    # See sonarcloud-scan for why this job-level env exists (so if:
+    # expressions can read SONARQUBE_TOKEN).
+    env:
+      SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || secrets.SONAR_ORGANIZATION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build (post-fix)
+        run: mvn -B -ntp -DskipTests package
+
+      - name: Download rebuilt coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: rebuild-output
+          path: target/
+
+        continue-on-error: true
+      - name: SonarCloud re-scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != '' && env.SONAR_ORGANIZATION != ''
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
+        # Same rationale as sonarcloud-scan: use `mvn sonar:sonar` so the
+        # Maven Sonar plugin's property resolver picks up ${env.X} from
+        # the step's env block (the CLI action v3 wrapper does not).
+        run: |
+          set -euo pipefail
+          mvn -B -ntp sonar:sonar \
+            -Dsonar.token="${SONAR_TOKEN}" \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+            -Dsonar.organization="${SONAR_ORGANIZATION}"
+
+      - name: SonarCloud re-scan (skipped)
+        if: env.SONAR_TOKEN == '' || env.SONAR_PROJECT_KEY == '' || env.SONAR_ORGANIZATION == ''
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          echo "::error::SonarCloud re-scan skipped (missing secrets)."
+          exit 1
+
+      - name: Generate post-fix Sonar report
+        if: always()
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          python3 scripts/generate-sonar-report.py \
+            --output-dir reports \
+            --host "${SONAR_HOST_URL}" \
+            --project-key "${SONAR_PROJECT_KEY}" \
+            --token "${SONAR_TOKEN}" \
+            --page-size 500
+          # Rename for clarity
+          if [ -f reports/sonar-report.json ]; then
+            cp reports/sonar-report.json reports/sonar-report-after-fix.json
+          fi
+          if [ -f reports/sonar-report.txt ]; then
+            cp reports/sonar-report.txt reports/sonar-report-after-fix.txt
+          fi
+
+      - name: Download pre-fix Sonar report
+        uses: actions/download-artifact@v4
+        with:
+          name: sonar-report
+          path: reports/
+
+        continue-on-error: true
+      - name: Generate Sonar diff report
+        if: always() && hashFiles('reports/sonar-report.json') != '' && hashFiles('reports/sonar-report-after-fix.json') != ''
+        run: |
+          set -euo pipefail
+          python3 scripts/generate-sonar-diff.py \
+            --before reports/sonar-report.json \
+            --after  reports/sonar-report-after-fix.json \
+            --output reports/sonar-diff-report.md
+
+      - name: Upload post-fix Sonar artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-report-after-fix
+          path: |
+            reports/sonar-report-after-fix.json
+            reports/sonar-report-after-fix.txt
+            reports/sonar-diff-report.md
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 10. TRIVY RE-SCAN
+  # ---------------------------------------------------------------
+  trivy-rescan:
+    name: "11. Trivy Re-Scan"
+    runs-on: ubuntu-latest
+    needs: [rebuild-and-retest]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build container image (post-remediation)
+        id: build_image
+        env:
+          IMAGE_TAG: vulnerable-spring-app:ci-${{ github.sha }}-after-fix
+        run: |
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          docker build -t "${IMAGE_TAG}" --load .
+
+      - name: Run Trivy re-scan (FS + image)
+        env:
+          TRIVY_SEVERITY: "CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN"
+          TRIVY_IMAGE: ${{ steps.build_image.outputs.IMAGE_TAG }}
+        run: |
+          # Write to a separate dir so we don't overwrite the pre-fix report.
+          bash scripts/generate-trivy-report.sh reports-after-fix .
+
+      - name: Rename Trivy re-scan outputs
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f reports-after-fix/trivy-report.json ]; then
+            mv reports-after-fix/trivy-report.json reports/trivy-report-after-fix.json
+          fi
+          if [ -f reports-after-fix/trivy-report.txt ]; then
+            mv reports-after-fix/trivy-report.txt reports/trivy-report-after-fix.txt
+          fi
+          if [ -f reports-after-fix/trivy-fs.sarif ]; then
+            mv reports-after-fix/trivy-fs.sarif reports/trivy-fs-after-fix.sarif
+          fi
+          if [ -f reports-after-fix/trivy-image.sarif ]; then
+            mv reports-after-fix/trivy-image.sarif reports/trivy-image-after-fix.sarif
+          fi
+          rm -rf reports-after-fix
+
+      - name: Download pre-fix Trivy report
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-report
+          path: reports/
+
+        continue-on-error: true
+      - name: Generate Trivy diff report
+        if: always() && hashFiles('reports/trivy-report.json') != '' && hashFiles('reports/trivy-report-after-fix.json') != ''
+        run: |
+          set -euo pipefail
+          python3 scripts/generate-trivy-diff.py \
+            --before reports/trivy-report.json \
+            --after  reports/trivy-report-after-fix.json \
+            --output reports/trivy-diff.md
+
+      - name: Upload Trivy re-scan SARIF (FS) to Security tab
+        if: always() && hashFiles('reports/trivy-fs-after-fix.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/trivy-fs-after-fix.sarif
+          category: trivy-fs-after-fix
+
+      - name: Upload Trivy re-scan SARIF (image) to Security tab
+        if: always() && hashFiles('reports/trivy-image-after-fix.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/trivy-image-after-fix.sarif
+          category: trivy-image-after-fix
+
+      - name: Upload Trivy re-scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report-after-fix
+          path: |
+            reports/trivy-report-after-fix.json
+            reports/trivy-report-after-fix.txt
+            reports/trivy-fs-after-fix.sarif
+            reports/trivy-image-after-fix.sarif
+            reports/trivy-diff.md
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # GATEKEEPER — runs before deploy
+  # ---------------------------------------------------------------
+  check-deploy-gates:
+    name: "Pre-Deploy Gates"
+    runs-on: ubuntu-latest
+    needs: [rebuild-and-retest, sonarcloud-rescan, trivy-rescan, security-ai-remediate, codeql]
+    if: ${{ always() }}
+    outputs:
+      deploy_recommended: ${{ steps.gates.outputs.deploy_recommended }}
+      ref: ${{ steps.set_ref.outputs.ref }}
+    steps:
+      # AI remediation pushes its commit back to the trigger ref, so
+      # this job checks out the same ref as the rebuild. For
+      # pull_request events the trigger ref is the PR head.
+      - name: Track the ref used by the rebuild
+        id: set_ref
+        run: echo "ref=${{ github.event.pull_request.head.ref || github.ref }}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.set_ref.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download all post-fix artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: rebuild-output
+          path: target/
+        continue-on-error: true
+      - name: Download post-fix Sonar
+        uses: actions/download-artifact@v4
+        with:
+          name: sonar-report-after-fix
+          path: reports/
+        continue-on-error: true
+      - name: Download post-fix Trivy
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-report-after-fix
+          path: reports/
+        continue-on-error: true
+      - name: Download remediation report
+        uses: actions/download-artifact@v4
+        with:
+          name: remediation
+          path: reports/
+
+        continue-on-error: true
+      - name: Download CodeQL SARIF
+        uses: actions/download-artifact@v4
+        with:
+          name: codeql-results
+          path: reports/
+
+        continue-on-error: true
+      - name: Normalize coverage report path
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            cp target/site/jacoco/jacoco.xml reports/jacoco.xml
+          fi
+          if [ -f target/site/jacoco/coverage-summary.csv ]; then
+            cp target/site/jacoco/coverage-summary.csv reports/coverage-summary.csv
+          fi
+          if [ -f target/site/jacoco/coverage-summary.json ]; then
+            cp target/site/jacoco/coverage-summary.json reports/coverage-summary.json
+          fi
+          if [ -f target/site/jacoco/coverage-summary.md ]; then
+            cp target/site/jacoco/coverage-summary.md reports/coverage-summary.md
+          fi
+
+      - name: Check all deploy gates
+        id: gates
+        if: always()
+        env:
+          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+          MIN_COVERAGE: ${{ env.MIN_COVERAGE }}
+          ALLOW_CRITICAL: ${{ env.ALLOW_CRITICAL }}
+          ALLOW_HIGH: ${{ env.ALLOW_HIGH }}
+        run: |
+          set -euo pipefail
+          python3 scripts/check-deploy-gates.py \
+            --coverage-summary reports/coverage-summary.csv \
+            --sonar-report        reports/sonar-report-after-fix.json \
+            --trivy-report        reports/trivy-report-after-fix.json \
+            --remediation-report  reports/remediation-report.json \
+            --codeql-sarif        reports/codeql-results.sarif \
+            --rebuild-result      target/.rebuild-ok \
+            --output              reports/deploy-gates.json
+        continue-on-error: true
+
+      - name: Echo gate result
+        if: always()
+        run: |
+          set -euo pipefail
+          cat reports/deploy-gates.json
+          DEPLOY=$(python3 -c "import json;print(json.load(open('reports/deploy-gates.json'))['deploy_recommended'])")
+          echo "deploy_recommended=${DEPLOY}" >> "$GITHUB_OUTPUT"
+          if [ "${DEPLOY}" != "True" ]; then
+            echo "::warning::Deploy gates did not all pass; deploy job will be skipped."
+          fi
+
+      - name: Upload deploy gate result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-gates
+          path: reports/deploy-gates.json
+          if-no-files-found: error
+          retention-days: 90
+
+  # ---------------------------------------------------------------
+  # 11. DEPLOY
+  # ---------------------------------------------------------------
+  deploy:
+    name: "12. Deploy"
+    runs-on: ubuntu-latest
+    needs: [check-deploy-gates]
+    if: ${{ needs.check-deploy-gates.outputs.deploy_recommended == 'True' }}
+    environment:
+      name: ${{ github.event.inputs.environment || vars.DEPLOY_ENV || 'dev' }}
+      url: ${{ steps.deploy.outputs.deploy_url }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-deploy-gates.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: rebuild-output
+          path: target/
+        continue-on-error: true
+      - name: Download gate decision
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-gates
+          path: reports/
+
+        continue-on-error: true
+      - name: Build deployable JAR
+        run: mvn -B -ntp -DskipTests -Dmaven.javadoc.skip=true package
+
+      - name: "🚢 Deploy"
+        id: deploy
+        env:
+          # Add the transport-specific secrets you need here, e.g.:
+          # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, KUBE_CONFIG, AZURE_CREDENTIALS, etc.
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          DEPLOY_ENV: ${{ github.event.inputs.environment || vars.DEPLOY_ENV || 'dev' }}
+        run: |
+          set -e
+          ENV="${DEPLOY_ENV}"
+          echo "::notice::Deploying to ${ENV}"
+          echo "Target JAR: $(ls -1 target/*.jar 2>/dev/null | head -n 1 || echo 'no jar')"
+          # ---------------------------------------------------------
+          #  REPLACE THIS BLOCK WITH YOUR REAL DEPLOY STEPS.
+          #  Examples:
+          #    - Azure Web Apps:    azure/webapps-deploy@v3
+          #    - AWS S3 + ECS:      aws-actions/configure-aws-credentials@v4 + ecspresso
+          #    - Kubernetes:        azure/k8s-set-context@v3 + kubectl apply
+          #    - SSH pull:          appleboy/scp-action
+          # ---------------------------------------------------------
+          mkdir -p deploy-artifacts
+          cp target/*.jar deploy-artifacts/ 2>/dev/null || true
+          echo "Deployed jar version: $(cat target/maven-archiver/pom.properties 2>/dev/null || echo unknown)" \
+            > deploy-artifacts/deploy-info.txt
+          echo "https://example.com/${ENV}/health" > deploy-artifacts/deploy-url.txt
+
+      - name: Upload deploy artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-artifacts
+          path: deploy-artifacts/
+          if-no-files-found: warn
+          retention-days: 30

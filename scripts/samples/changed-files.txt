@@ -1,0 +1,4 @@
+M	src/main/resources/application.properties
+M	src/main/java/com/owasp/lab/service/UserService.java
+M	pom.xml
+M	src/main/java/com/owasp/lab/config/SecurityConfig.java

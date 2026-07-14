@@ -1,0 +1,40 @@
+# Build artifacts
+target/
+*.jar
+*.war
+
+# VCS
+.git/
+.gitignore
+.gitattributes
+
+# CI / Claude tooling
+.github/
+.claude/
+SECURITY_ASSESSMENT_REPORT.md
+gitleaks-report.json
+trivy-fs.sarif
+trivy-image.sarif
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs (not needed in the image)
+README.md
+LICENSE
+docs/
+
+# Docker meta
+Dockerfile
+.dockerignore

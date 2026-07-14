@@ -2,12 +2,12 @@
   "schemaVersion": 2,
   "status": "OK",
   "project": "vulnerable-spring-app",
-  "projectKey": "nikita-jo_poc2",
+  "projectKey": "saurabhkumar504_DevOps-E2E-VR-using-Claude-Sonar-Qube-Trivy-Gitleaks",
   "host": "https://sonarcloud.io",
   "branch": "main",
-  "commit": "e4efea838ff01a63715e647737c2fa44ba5eb914",
-  "analysisDate": "2026-07-14T09:45:37+0000",
-  "qualityGate": "ERROR",
+  "commit": "1ff466a994948e5214b7ebd2e1152d9f25aac19d",
+  "analysisDate": "2026-07-14T11:12:24+0000",
+  "qualityGate": "NONE",
   "bugs": 0,
   "vulnerabilities": 0,
   "codeSmells": 0,
@@ -36,5 +36,5 @@
     "metrics": {},
     "issues": []
   },
-  "generatedAt": "2026-07-14T09:46:18Z"
+  "generatedAt": "2026-07-14T11:13:09Z"
 }

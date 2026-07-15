@@ -5,9 +5,9 @@
   "projectKey": "saurabhkumar504_DevOps-E2E-VR-using-Claude-Sonar-Qube-Trivy-Gitleaks",
   "host": "https://sonarcloud.io",
   "branch": "main",
-  "commit": "b74f831a30992a014626349fd148a0ca69ebae9c",
-  "analysisDate": "2026-07-15T08:46:59+0000",
-  "qualityGate": "ERROR",
+  "commit": "cd1426971de5d68d0b2868eaebec9c7802b587aa",
+  "analysisDate": "2026-07-15T09:04:59+0000",
+  "qualityGate": "OK",
   "bugs": 0,
   "vulnerabilities": 0,
   "codeSmells": 0,
@@ -36,5 +36,5 @@
     "metrics": {},
     "issues": []
   },
-  "generatedAt": "2026-07-15T08:47:47Z"
+  "generatedAt": "2026-07-15T09:05:42Z"
 }

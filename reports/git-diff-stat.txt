@@ -1,9 +1,11 @@
  Dockerfile                                         |   1 +
- reports/SONAR_REPORT.md                            |  14 +-
+ reports/SONAR_REPORT.md                            |   8 +-
  reports/llm-prompt.txt                             |   9 +
- reports/sonar-report.json                          |   8 +-
- reports/sonar-report.txt                           |   2 +-
- reports/trivy-image.raw.json                       | 348 ++++++++++-----------
- reports/trivy-image.sarif                          |   6 +-
+ reports/sonar-report.json                          |   6 +-
+ reports/trivy-image.raw.json                       | 580 ++++++++-------------
+ reports/trivy-image.sarif                          | 246 +--------
+ reports/trivy-image.sarif.json                     |  62 +--
+ reports/trivy-report.json                          |  66 +--
+ reports/trivy-report.txt                           |  12 +-
  .../java/com/owasp/lab/service/UserService.java    |  27 +-
- 8 files changed, 218 insertions(+), 197 deletions(-)
+ 10 files changed, 270 insertions(+), 747 deletions(-)

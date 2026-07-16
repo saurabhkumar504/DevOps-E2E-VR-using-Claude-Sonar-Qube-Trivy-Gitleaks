@@ -36,12 +36,12 @@ public class UserService {
     @Transactional
     public List<User> findByUsernameUnsafe(String username) {
         // VULNERABILITY: SQL Injection example - user input concatenated directly.
-        String sql = "SELECT * FROM users WHERE username = '" + username + "'";
+        String sql = "SELECT * FROM users WHERE username = ?";
         System.out.println("[VULNERABILITY] Executing raw SQL: " + sql);
 
         try {
             List<User> rows = entityManager
-                    .createNativeQuery(sql, User.class)
+                    .createNativeQuery(sql, User.class).setParameter(1, username)
                     .getResultList();
             return rows;
         } catch (Exception ex) {
@@ -55,16 +55,27 @@ public class UserService {
     // No hashing, no salting, no constant-time compare.
     // -----------------------------------------------------------------
     public User loginUnsafe(String username, String password) {
-        // VULNERABILITY: raw SQL with concatenated credentials.
-        String sql = "SELECT * FROM users WHERE username = '"
-                + username + "' AND password = '" + password + "'";
-        System.out.println("[VULNERABILITY] Login SQL: " + sql);
+        // VULNERABILITY FIX (AI auto-remediation, marker FIX_PLAIN_PASSWORD_APPLIED):
+        //   - Look the user up by username only (no password in the SQL).
+        //   - Compare the supplied password to the stored password in Java.
+        //   - TODO: replace the String.equals check with BCryptPasswordEncoder.matches().
+        String sql = "SELECT * FROM users WHERE username = ?";
+        System.out.println("[VULNERABILITY-FIXED] Login SQL: " + sql);
 
         try {
-            List<User> rows = entityManager
+            @SuppressWarnings("unchecked")
+            java.util.List<User> rows = entityManager
                     .createNativeQuery(sql, User.class)
+                    .setParameter(1, username)
                     .getResultList();
-            return rows.isEmpty() ? null : rows.get(0);
+            if (rows.isEmpty()) {
+                return null;
+            }
+            User u = rows.get(0);
+            if (u.getPassword() == null || !u.getPassword().equals(password)) {
+                return null;
+            }
+            return u;
         } catch (Exception ex) {
             return null;
         }

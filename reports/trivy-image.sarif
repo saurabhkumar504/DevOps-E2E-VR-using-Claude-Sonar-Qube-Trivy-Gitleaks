@@ -482,8 +482,8 @@
               },
               "helpUri": "https://avd.aquasec.com/nvd/cve-2026-10532",
               "help": {
-                "text": "Vulnerability CVE-2026-10532\nSeverity: LOW\nPackage: ch.qos.logback:logback-core\nFixed Version: 1.5.35\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive.",
-                "markdown": "**Vulnerability CVE-2026-10532**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|ch.qos.logback:logback-core|1.5.35|[CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)|\n\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive."
+                "text": "Vulnerability CVE-2026-10532\nSeverity: LOW\nPackage: ch.qos.logback:logback-core\nFixed Version: 1.5.34\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive.",
+                "markdown": "**Vulnerability CVE-2026-10532**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|LOW|ch.qos.logback:logback-core|1.5.34|[CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)|\n\nDeserialization of untrusted data vulnerability in QOS.CH Sarl logback logback-core (HardenedObjectInputStream (logback-core) modules) allows Object Injection, albeit heavily restricted.\n\nMore precisely, an attacker able to influence serialized data sent to \nSimpleSocketServer or SimpleSSLSocketServer can instantiate Proxy objects.\n\n\nAlthough deserialization is heavily restricted by HardenedObjectInputStream and no \npractical way to achieve remote code execution or significant privilege \nescalation has been identified, this issue constitutes a bypass of the \nintended security restrictions.\n\n\n\nThis issue affects logback: through 1.5.33 inclusive."
               },
               "properties": {
                 "cvssv40_baseScore": 2.9,
@@ -1848,7 +1848,7 @@
           "ruleIndex": 17,
           "level": "note",
           "message": {
-            "text": "Package: ch.qos.logback:logback-core\nInstalled Version: 1.5.32\nVulnerability CVE-2026-10532\nSeverity: LOW\nFixed Version: 1.5.35\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)"
+            "text": "Package: ch.qos.logback:logback-core\nInstalled Version: 1.5.32\nVulnerability CVE-2026-10532\nSeverity: LOW\nFixed Version: 1.5.34\nLink: [CVE-2026-10532](https://avd.aquasec.com/nvd/cve-2026-10532)"
           },
           "locations": [
             {
@@ -2116,11 +2116,11 @@
       ],
       "columnKind": "utf16CodeUnits",
       "properties": {
-        "imageID": "sha256:2f693ca2d544d33eb910a1c4c1abab40f5049a20fe7d2d2db00661f9a8a700ae",
-        "imageName": "vulnerable-spring-app:ci-cd1426971de5d68d0b2868eaebec9c7802b587aa",
+        "imageID": "sha256:392e21d9c1f73682859cf5a4a5b8392f208a5d80d7399840392d36b39759a1f1",
+        "imageName": "vulnerable-spring-app:ci-844bc569818db05814eb85e016da4ca8f94ba8f0",
         "repoDigests": [],
         "repoTags": [
-          "vulnerable-spring-app:ci-cd1426971de5d68d0b2868eaebec9c7802b587aa"
+          "vulnerable-spring-app:ci-844bc569818db05814eb85e016da4ca8f94ba8f0"
         ]
       }
     }

@@ -5,3 +5,6 @@ reports/sonar-report.json
 reports/sonar-report.txt
 reports/trivy-image.raw.json
 reports/trivy-image.sarif
+reports/trivy-image.sarif.json
+reports/trivy-report.json
+src/main/java/com/owasp/lab/service/UserService.java

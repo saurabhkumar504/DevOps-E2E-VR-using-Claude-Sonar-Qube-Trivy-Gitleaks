@@ -647,11 +647,11 @@
     "cve": "CVE-2026-10532",
     "pkgName": "ch.qos.logback:logback-core",
     "installedVersion": "1.5.32",
-    "fixedVersion": "1.5.35",
+    "fixedVersion": "1.5.34",
     "description": null,
     "file": "app/app.jar/BOOT-INF/lib/logback-core-1.5.32.jar",
     "line": 1,
-    "recommendation": "Upgrade ch.qos.logback:logback-core to 1.5.35",
+    "recommendation": "Upgrade ch.qos.logback:logback-core to 1.5.34",
     "category": "vulnerability",
     "scanner": "image"
   },

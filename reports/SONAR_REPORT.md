@@ -3,13 +3,13 @@
 **Project:** vulnerable-spring-app  
 **Project Key:** `saurabhkumar504_DevOps-E2E-VR-using-Claude-Sonar-Qube-Trivy-Gitleaks`  
 **Branch:** `main`  
-**Commit SHA:** `cd1426971de5d68d0b2868eaebec9c7802b587aa`  
-**Analysis Date:** 2026-07-15T09:04:59+0000  
-**Quality Gate Status:** ✅ **OK**  
+**Commit SHA:** `844bc569818db05814eb85e016da4ca8f94ba8f0`  
+**Analysis Date:** 2026-07-16T07:41:09+0000  
+**Quality Gate Status:** ❌ **ERROR**  
 
 ## Quality Gate Status
 
-The SonarCloud quality gate is **OK**.
+The SonarCloud quality gate is **ERROR**.
 
 ## Coverage
 
@@ -41,11 +41,11 @@ The SonarCloud quality gate is **OK**.
 
 ## Summary
 
-This SonarCloud Cloud analysis scanned **vulnerable-spring-app** on branch `main` at commit `cd1426971de5d68d0b2868eaebec9c7802b587aa`. The quality gate is **OK**, line coverage is **N/A**, with **0** vulnerabilities, **0** bugs, **0** code smells, and **0** security hotspots.
+This SonarCloud Cloud analysis scanned **vulnerable-spring-app** on branch `main` at commit `844bc569818db05814eb85e016da4ca8f94ba8f0`. The quality gate is **ERROR**, line coverage is **N/A**, with **0** vulnerabilities, **0** bugs, **0** code smells, and **0** security hotspots.
 
 ## Recommendations
 
-- No outstanding recommendations. The codebase is within policy thresholds.
+- Quality gate **ERROR** — review the metrics below and address every failing condition before deploying.
 
 ---
-_Report generated at 2026-07-15T09:05:42Z._  _See `sonar-report.json` for the full machine-readable payload._
+_Report generated at 2026-07-16T07:41:54Z._  _See `sonar-report.json` for the full machine-readable payload._
